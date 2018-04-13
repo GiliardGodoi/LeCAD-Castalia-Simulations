@@ -1,3 +1,32 @@
+# IGNORAR COMPLETAMENTE
+omnetpp-4.6
+Castalia-3.3
+out
+bin
+CastaliaBin
+AODVTest
+BANtest
+BridgeTest
+connectivityMap
+mobilityTest
+radioTest
+simpleAggregation
+valuePropagation
+valueReporting
+
+# Arquivos compactados
+*.zip
+
+# vscode configurations
+.vscode
+
+# arquivos de imagens
+*.png
+*.jpeg
+*.jpg
+*.gif
+*.ps
+
 # Prerequisites
 *.d
 

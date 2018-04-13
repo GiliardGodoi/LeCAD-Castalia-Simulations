@@ -4,6 +4,7 @@ Castalia-3.3
 out
 bin
 CastaliaBin
+# ignorando as simulações padrão
 AODVTest
 BANtest
 BridgeTest
@@ -13,6 +14,10 @@ radioTest
 simpleAggregation
 valuePropagation
 valueReporting
+# ignorando pastas com resultados de simulações anteriores
+energia
+resultados
+tempo
 
 # Arquivos compactados
 *.zip

@@ -1,0 +1,33 @@
+CastaliaResults -i saida220917.ttt -s packet -n -o 2                                                     
+
+Application:Packets loss rate - total
+ | index=1 | index=2 | index=3 | index=4 | index=5
+InterfModel=0 | 0.115 | 0.065 | 0.14 | 0.219 | 0.316 
+InterfModel=1 | 0.212 | 0.176 | 0.236 | 0.381 | 0.518 
+
+
+Application:Packets received per node
+ | index=1 | index=2 | index=3 | index=4 | index=5
+InterfModel=0 | 2655 | 2803.333 | 3868.333 | 5858.667 | 5125.667 
+InterfModel=1 | 2363 | 2471.333 | 3439 | 4639 | 3614.333 
+
+
+Application:Packets reception rate - total
+ | index=1 | index=2 | index=3 | index=4 | index=5
+InterfModel=0 | 0.885 | 0.935 | 0.86 | 0.781 | 0.684 
+InterfModel=1 | 0.788 | 0.824 | 0.764 | 0.619 | 0.482 
+
+
+Communication.MAC:Packet breakdown
+ | Failed, buffer overflow | Failed, busy channel | Failed, no ack | Success, first try | Success, not first try
+InterfModel=0,node=1 | 0 | 84.667 | 356.333 | 2001.333 | 554.333 
+InterfModel=0,node=2 | 0 | 89.333 | 122.667 | 2199 | 586 
+InterfModel=0,node=3 | 1 | 76.667 | 719.667 | 2956.667 | 735.667 
+InterfModel=0,node=4 | 1151.333 | 78 | 523 | 4782.333 | 936 
+InterfModel=0,node=5 | 1631.333 | 62.333 | 810.667 | 4193.333 | 772.333 
+InterfModel=1,node=1 | 0 | 80.667 | 641 | 1737 | 537.333 
+InterfModel=1,node=2 | 0 | 88.333 | 455.333 | 1834.333 | 619.667 
+InterfModel=1,node=3 | 81 | 82 | 1033.667 | 2567.333 | 708.667 
+InterfModel=1,node=4 | 1926.333 | 81.333 | 930 | 3665 | 866.333 
+InterfModel=1,node=5 | 2467.333 | 56 | 1476.667 | 2674 | 791.667 
+

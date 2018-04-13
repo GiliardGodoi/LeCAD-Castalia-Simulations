@@ -1,0 +1,9 @@
+#0 is R-hip quadril
+#1 is back costas
+#2 is shoulder ombro
+#3 is chest peito
+0>1:75,2:58,3:45
+1>0:75,2:40,3:65
+2>0:58,1:40,3:40
+3>0:45,1:65,2:40
+

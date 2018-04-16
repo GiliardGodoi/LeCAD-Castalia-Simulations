@@ -1,0 +1,16 @@
+CastaliaResults -i saida.txt -s breakdown -o2                                              
+
+Communication.MAC:Packet breakdown
+Failed, buffer overflow | Failed, busy channel | Failed, no ack | Success, first try | Success, not first try
+| 204.715 | 5.721 | 28.388 | 1146.673 | 299.442 
+
+
+Communication.MAC:pkt TX state breakdown - Contention
+ | 
+ | 1605.303 
+
+
+Communication.Radio:RX pkt breakdown
+Failed, below sensitivity | Failed, non RX state | Received with NO interference
+| 316.485 | 679.091 | 12138.263 
+

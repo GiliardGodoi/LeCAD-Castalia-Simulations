@@ -1,0 +1,16 @@
+CastaliaResults -i saida.txt -s energy -n -o2                                              
+
+Application:Energy nJ/bit
+ | node=1 | node=2 | node=3 | node=4 | node=5
+ | 98.484 | 100.881 | 64.951 | 48.921 | 50.407 
+
+
+ResourceManager:Consumed Energy
+ | node=0 | node=1 | node=2 | node=3 | node=4 | node=5
+ | 0.313 | 0.081 | 0.084 | 0.079 | 0.082 | 0.08 
+
+
+ResourceManager:Remaining Energy
+ | node=0 | node=1 | node=2 | node=3 | node=4 | node=5
+ | 18719.7 | 18719.9 | 18719.9 | 18719.9 | 18719.9 | 18719.9 
+

@@ -21,8 +21,7 @@ int ThroughputTest::varayPowerLevel(int noIndex, int nivelAnterior, int variacao
 		vetorNivelNo[noIndex] = nivelAtual;
 		potencia = vetorPotencia[nivelAtual];
 	}
-	trace() << "INDEX " << noIndex << " ANTERIOR " << nivelAnterior << " VARIACAO " << variacao;
-	trace() << " SET_POTENCIA " << potencia;
+	trace() << "INDEX  " << noIndex << "  ANTERIOR  " << nivelAnterior << "  VARIACAO  " << variacao;
 	return potencia;
 }
 
@@ -288,7 +287,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			variacao = -1; // aqui o nivel incrementa de qualquer jeito
 			// funcao que varia a potencia ... varayPowerLevel(int noIndex, int nivelAnterior, int variacao)
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA " << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		} 
 
@@ -307,7 +306,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 				variacao = 0;
 			}
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA " << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 
@@ -326,7 +325,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 				variacao = 0;
 			}
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA " << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 
@@ -345,7 +344,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 				variacao = 0;
 			}
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA " << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 // =================== CONFIGURAÇÃO PARA PACKET_RATE 15 ===============================
@@ -357,7 +356,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			nivelClassificado = 0;
 			variacao = -1;
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA " << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		} 
 
@@ -376,7 +375,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 				variacao = 0;
 			}
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA2" << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 
@@ -395,7 +394,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 				variacao = 0;
 			}
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA3" << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 
@@ -414,7 +413,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 				variacao = 0;
 			}
 			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
-			trace() << " ALTERADO PARA POTENCIA4" << potencia;
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 
@@ -423,7 +422,9 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 
 		else if (taxaMAC <= 100 && (packet_rate ==25) ) { 
 //			trace() << " ALTERADO PARA POTENCIA4 " << potencia1;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,vetorPotencia[0])); 
+			int potencia = vetorPotencia[0];
+			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 //			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold2)); 
 		} 
 

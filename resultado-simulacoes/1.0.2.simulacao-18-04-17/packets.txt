@@ -1,0 +1,22 @@
+CastaliaResults -i saida.txt -s packets -n -o2                                               
+
+Application:Packets loss rate - total
+ | index=1 | index=2 | index=3 | index=4 | index=5
+InterfModel=0 | 0.02 | 0.011 | 0.035 | 0.202 | 0.248 
+InterfModel=1 | 0.039 | 0.035 | 0.097 | 0.328 | 0.373 
+InterfModel=2 | 0.035 | 0.014 | 0.072 | 0.268 | 0.308 
+
+
+Application:Packets received per node
+ | index=1 | index=2 | index=3 | index=4 | index=5
+InterfModel=0 | 979.424 | 987.697 | 1446.424 | 1994.242 | 1878.909 
+InterfModel=1 | 959.909 | 964.576 | 1353.152 | 1678.455 | 1567.727 
+InterfModel=2 | 963.803 | 985.348 | 1391.152 | 1829.015 | 1728.652 
+
+
+Application:Packets reception rate - total
+ | index=1 | index=2 | index=3 | index=4 | index=5
+InterfModel=0 | 0.98 | 0.989 | 0.965 | 0.798 | 0.752 
+InterfModel=1 | 0.961 | 0.965 | 0.903 | 0.672 | 0.627 
+InterfModel=2 | 0.965 | 0.986 | 0.928 | 0.732 | 0.692 
+

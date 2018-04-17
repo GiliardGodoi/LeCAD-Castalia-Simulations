@@ -420,13 +420,73 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 
 //====================== CONFIGURAÇÃO PARA PARA PACKET_RATE 25 =======================
 
-		else if (taxaMAC <= 100 && (packet_rate ==25) ) { 
-//			trace() << " ALTERADO PARA POTENCIA4 " << potencia1;
-			int potencia = vetorPotencia[0];
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
+else if ( taxaMAC <= 40 &&  (packet_rate == 25) ) { 
+//			trace() << " ALTERADO PARA POTENCIA1 " << potencia1;
+//			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia1)); 
+//			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold2));
+			nivelClassificado = 0;
+			variacao = -1;
+			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
 			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-//			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold2)); 
+			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		} 
+
+		else if (taxaMAC < 70 && (packet_rate == 25)  ) {
+//			trace() << " ALTERADO PARA POTENCIA2" << potencia2;
+//			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia2));
+//			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
+			nivelClassificado = 1;
+			if (nivelClassificado < nivelAnterior) {
+				variacao = +1;
+			} 
+			else if ( nivelClassificado > nivelAnterior) {
+				variacao = -1;
+			}
+			else {
+				variacao = 0;
+			}
+			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
+			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
+		}
+
+		else if (taxaMAC < 90 && (packet_rate == 25)  ) {
+//			trace() << " ALTERADO PARA POTENCIA3" << potencia3;
+//			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia3));
+//			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
+			nivelClassificado = 2;
+			if (nivelClassificado < nivelAnterior) {
+				variacao = -1;
+			} 
+			else if ( nivelClassificado > nivelAnterior) {
+				variacao = +1;
+			}
+			else {
+				variacao = 0;
+			}
+			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
+			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
+		}
+
+		else if (taxaMAC >= 90 && (packet_rate == 25)  ) {
+//			trace() << " ALTERADO PARA POTENCIA4" << potencia4;
+//			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia4));
+//			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
+			nivelClassificado = 3;
+			if (nivelClassificado < nivelAnterior) {
+				variacao = -1;
+			} 
+			else if ( nivelClassificado > nivelAnterior) {
+				variacao = +1;
+			}
+			else {
+				variacao = 0;
+			}
+			int potencia = varayPowerLevel(indexNO,nivelAnterior, variacao);
+			trace() << "NO  " << indexNO << "  ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
+			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
+		}
 
 //====================================================================================		
 	

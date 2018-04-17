@@ -1,16 +1,0 @@
-CastaliaResults -i saida.txt -s packets -n -o2                                               
-
-Application:Packets loss rate - total
- | index=1 | index=2 | index=3 | index=4 | index=5
- | 0.02 | 0.011 | 0.035 | 0.202 | 0.248 
-
-
-Application:Packets received per node
- | index=1 | index=2 | index=3 | index=4 | index=5
- | 979.424 | 987.697 | 1446.424 | 1994.242 | 1878.909 
-
-
-Application:Packets reception rate - total
- | index=1 | index=2 | index=3 | index=4 | index=5
- | 0.98 | 0.989 | 0.965 | 0.798 | 0.752 
-

@@ -1,12 +1,12 @@
-#!/usr/bin/awk −f
-BEGIN{
-} 
+#! /usr/bin/awk -f
+
+BEGIN { }
 { 
-	if($3 == "Janela"){ 
-		tStr = $2
-		gsub(/[^0-9]/,"",tStr)
-		print tStr"\t"$5
+	tStr = $2
+	gsub(/[^0-9]/,"",tStr)
+	if ($3 == "ALTERADO" && tStr == 4 ){
+		# NO | TEMPO | POTENCIA | TAXA MAC
+		print tStr"|"$1"|"$6"|"$9
 	}	
 }
-END{
-} 
+END { }

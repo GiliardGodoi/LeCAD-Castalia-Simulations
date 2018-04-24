@@ -49,7 +49,7 @@ class ThroughputTest: public VirtualApplication {
 	int handleControlCommand(cMessage * msg);
 	void countTransmitions();
 	int getPacketCount(int node);
-	int varayPowerLevel(int noIndex, int nivelAnterior, int variacao);
+	int varayPowerLevel(int noIndex,int variacao);
 
  public:
 	int getPacketsSent(int addr) { return packetsSent[addr]; }

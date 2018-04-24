@@ -5,8 +5,22 @@
 
 Define_Module(ThroughputTest);
 
-int nPacket1 = 0, nPacket2 = 0, nPacket3 = 0, nPacket4 = 0, nPacket5 = 0, nPacket0 = 0,
-nTime1 = 0, nTime2 = 0, nTime3 = 0, nTime4 = 0, nTime5 = 0, packet_rate_safe, priority, potenciaFinal = 0;
+int nPacket1 = 0,
+	nPacket2 = 0,
+	nPacket3 = 0,
+	nPacket4 = 0,
+	nPacket5 = 0,
+	nPacket0 = 0;
+
+int nTime1 = 0,
+	nTime2 = 0,
+	nTime3 = 0,
+	nTime4 = 0,
+	nTime5 = 0,
+	packet_rate_safe,
+	priority,
+	potenciaFinal = 0;
+
 float packet_spacing_safe;
 double taxaMAC = 0.0;
 

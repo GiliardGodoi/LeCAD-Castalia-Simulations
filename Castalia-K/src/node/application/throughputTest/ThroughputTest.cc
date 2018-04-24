@@ -10,7 +10,10 @@ nTime1 = 0, nTime2 = 0, nTime3 = 0, nTime4 = 0, nTime5 = 0, packet_rate_safe, pr
 float packet_spacing_safe;
 double taxaMAC = 0.0;
 
-int vetorNivelNo[] = {-1, 2, 2, 2, 2, 2};
+// valor inicial dos níveis deve corresponder ao valor inicial de transmissão do rádio
+// que é definido no omnetpp.ini
+int vetorNivelMACNo[] = {-1, 0, 0, 0, 0, 0};
+//int vetorNivelPotenciaNo[] = {-1, 0, 0, 0, 0, 0};
 int vetorPotencia[5];
 
 int ThroughputTest::varayPowerLevel(int noIndex, int nivelAnterior, int variacao)
@@ -18,7 +21,7 @@ int ThroughputTest::varayPowerLevel(int noIndex, int nivelAnterior, int variacao
 	int nivelAtual = nivelAnterior + variacao;
 	int potencia = vetorPotencia[nivelAnterior];
 	if( (nivelAtual >=0) && (nivelAtual < 4)){
-		vetorNivelNo[noIndex] = nivelAtual;
+		vetorNivelMACNo[noIndex] = nivelAtual;
 		potencia = vetorPotencia[nivelAtual];
 	}
 	trace() << "INDEX  " << noIndex << "  ANTERIOR  " << nivelAnterior << "  VARIACAO  " << variacao;
@@ -275,7 +278,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 		taxaMAC = cmd->getParameter();
 //		trace() << "TAXAMAC"<<taxaMAC;
 //		trace() << "packet_rate" << packet_rate;
-		int nivelAnterior = vetorNivelNo[indexNO];
+		int nivelAnterior = vetorNivelMACNo[indexNO];
 		int nivelClassificado = nivelAnterior;
 // ================= CONFIGURAÇÃO PARA PACKET_RATE 10 =================================
 

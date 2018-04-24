@@ -4,6 +4,7 @@ Castalia-3.3
 out
 bin
 CastaliaBin
+Makefile
 # ignorando as simulações padrão
 AODVTest
 BANtest

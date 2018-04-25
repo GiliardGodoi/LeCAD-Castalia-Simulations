@@ -298,14 +298,8 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 		if (taxaMAC <= 40 && ( packet_rate ==10  ) ) { 
 			nivelClassificado = 0;
 			variacao = -1; // aqui o nivel incrementa de qualquer jeito
-			// funcao que varia a potencia ... varayPowerLevel(int noIndex, int nivelAnterior, int variacao)
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
-
 		else if (taxaMAC < 70 && ( packet_rate == 10 ) ) {
-
 			nivelClassificado = 1;
 			if (nivelClassificado < nivelAnterior) {
 				variacao = -1;
@@ -316,11 +310,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
-
 		else if (taxaMAC < 90 && ( packet_rate == 10) ) {
 			nivelClassificado = 2;
 			if (nivelClassificado < nivelAnterior) {
@@ -332,11 +322,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
-
 		else if (taxaMAC >= 90 && (packet_rate == 10) ){
 			nivelClassificado = 3;
 			if (nivelClassificado < nivelAnterior) {
@@ -348,19 +334,12 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 // 		================= CONFIGURAÇÃO PARA PACKET_RATE 15 =================
 		else if ( taxaMAC <= 40 &&  (packet_rate ==15) ) { 
 			nivelClassificado = 0;
 			variacao = -1;
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		} 
-
 		else if (taxaMAC < 70 && (packet_rate ==15)  ) {
 			nivelClassificado = 1;
 			if (nivelClassificado < nivelAnterior) {
@@ -372,11 +351,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
-
 		else if (taxaMAC < 90 && (packet_rate ==15)  ) {
 			nivelClassificado = 2;
 			if (nivelClassificado < nivelAnterior) {
@@ -388,11 +363,7 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
-
 		else if (taxaMAC >= 90 && (packet_rate ==15)  ) {
 			nivelClassificado = 3;
 			if (nivelClassificado < nivelAnterior) {
@@ -404,19 +375,12 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 //		================= CONFIGURAÇÃO PARA PARA PACKET_RATE 25 =================
 		else if ( taxaMAC <= 40 &&  (packet_rate == 25) ) { 
 			nivelClassificado = 0;
 			variacao = -1;
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
-		} 
-
+		}
 		else if (taxaMAC < 70 && (packet_rate == 25)  ) {
 			nivelClassificado = 1;
 			if (nivelClassificado < nivelAnterior) {
@@ -428,9 +392,6 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 
 		else if (taxaMAC < 90 && (packet_rate == 25)  ) {
@@ -444,9 +405,6 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
 
 		else if (taxaMAC >= 90 && (packet_rate == 25)  ) {
@@ -460,11 +418,12 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			else {
 				variacao = 0;
 			}
-			int potencia = varayPowerLevel(indexNO, variacao);
-			trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
-			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		}
-		
+
+		// funcao que varia a potencia ... varayPowerLevel(int noIndex, int nivelAnterior, int variacao)
+		int potencia = varayPowerLevel(indexNO, variacao);
+		trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
+		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		vetorNivelMACNo[indexNO] = nivelClassificado;
 
 		delete cmd;

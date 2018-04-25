@@ -4,9 +4,15 @@ Castalia-3.3
 out
 bin
 CastaliaBin
-./Makefile
 
-# ignorando as simulações padrão
+# ignorando arquivos de dados das simulações
+Castalia-Trace.txt
+breakdown.txt
+energy.txt
+packets.txt
+saida.txt
+
+# ignorando as outras simulações padrão
 AODVTest
 BANtest
 BridgeTest
@@ -16,6 +22,7 @@ radioTest
 simpleAggregation
 valuePropagation
 valueReporting
+
 # ignorando pastas com resultados de simulações anteriores
 energia
 resultados

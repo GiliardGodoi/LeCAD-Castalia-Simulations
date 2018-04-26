@@ -31,18 +31,46 @@ int vetorNivelPotenciaNo[] = {-1, 0, 0, 0, 0, 0};
 int vetorNivelMACNo[] = {-1, 0, 0, 0, 0, 0};
 int vetorPotencia[5];
 
-int ThroughputTest::varayPowerLevel(int noIndex, int variacao)
+int ThroughputTest::varyPowerLevel(int noIndex, int variacao)
+{
+	switch(politica)
+	{
+		case 1:
+			return policyVaryPowerBetweenRange(noIndex, variacao);
+			break;
+		case 2:
+			return policyVaryPowerInCycle(noIndex, variacao);
+			break;
+		default:
+			return vetorPotencia[vetorNivelPotenciaNo[noIndex]];
+	}
+}
+
+int ThroughputTest::policyVaryPowerBetweenRange(int noIndex, int variacao)
 {
 	int indexPotenciaAnterior = vetorNivelPotenciaNo[noIndex];
 	int potencia = vetorPotencia[indexPotenciaAnterior];
 
 	int indexPotenciaAtual = indexPotenciaAnterior + variacao;
 
-	if( (indexPotenciaAtual >=0) && (indexPotenciaAtual < 4)){
+	if( (indexPotenciaAtual >=0) && (indexPotenciaAtual < maxIndicePotencia)){
 		vetorNivelPotenciaNo[noIndex] = indexPotenciaAtual;
 		potencia = vetorPotencia[indexPotenciaAtual];
 	}
 
+	return potencia;
+}
+
+int ThroughputTest::policyVaryPowerInCycle(int noIndex,int variacao)
+{
+	int indexPotenciaAnterior = vetorNivelPotenciaNo[noIndex];
+	int tmp = indexPotenciaAnterior + variacao;
+	if(tmp < 0)	tmp = maxIndicePotencia - 1;
+
+	int indexPotenciaAtual = tmp % maxIndicePotencia;
+	vetorNivelPotenciaNo[noIndex] = indexPotenciaAtual;
+
+	int potencia = vetorPotencia[indexPotenciaAtual];
 	return potencia;
 }
 
@@ -51,6 +79,10 @@ void ThroughputTest::startup()
 
 	taxa = par("taxa");
 	isSink = par("isSink");
+
+	politica = par("politica");
+	maxIndicePotencia = par("maxIndicePotencia");
+	maxIndicePotencia = (maxIndicePotencia > 1) && (maxIndicePotencia <= 5) ? maxIndicePotencia : 5;
 
 	CCAthreshold = par("CCAthreshold");
 	CCAthreshold2 = par("CCAthreshold2");
@@ -73,7 +105,7 @@ void ThroughputTest::startup()
 	packet_spacing_safe = packet_spacing;
 //	packet_spacing = packet_rate;
 	dataSN = 0;
-	trace() << "Inicio"<<SELF_NETWORK_ADDRESS;
+	trace() << "Inicio"<<SELF_NETWORK_ADDRESS << "  politica  " << politica << "  maxIndicePotencia  " << maxIndicePotencia;
 	numNodes = getParentModule()->getParentModule()->par("numNodes");
 	packetsSent.clear();
 	packetsReceived.clear();
@@ -420,8 +452,8 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			}
 		}
 
-		// funcao que varia a potencia ... varayPowerLevel(int noIndex, int nivelAnterior, int variacao)
-		int potencia = varayPowerLevel(indexNO, variacao);
+		// funcao que varia a potencia ... varyPowerLevel(int noIndex, int nivelAnterior, int variacao)
+		int potencia = varyPowerLevel(indexNO, variacao);
 		trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		vetorNivelMACNo[indexNO] = nivelClassificado;

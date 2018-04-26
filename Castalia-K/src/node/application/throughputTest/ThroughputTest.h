@@ -33,6 +33,9 @@ class ThroughputTest: public VirtualApplication {
 	int potencia5;
 	bool isSink;
 
+	int politica;
+	int maxIndicePotencia;
+
 	//variables below are used to determine the packet delivery rates.	
 	int numNodes;
 	map<long,int> packetsReceived;
@@ -49,7 +52,9 @@ class ThroughputTest: public VirtualApplication {
 	int handleControlCommand(cMessage * msg);
 	void countTransmitions();
 	int getPacketCount(int node);
-	int varayPowerLevel(int noIndex, int nivelAnterior, int variacao);
+	int varyPowerLevel(int noIndex,int variacao);
+	int policyVaryPowerBetweenRange(int noIndex,int variacao);
+	int policyVaryPowerInCycle(int noIndex,int variacao);
 
  public:
 	int getPacketsSent(int addr) { return packetsSent[addr]; }

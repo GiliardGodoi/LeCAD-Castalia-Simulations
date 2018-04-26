@@ -23,6 +23,9 @@ simple ThroughputTest like node.application.iApplication {
 
 	bool isSink = default(false);
 
+	int politica = default(0);
+	int maxIndicePotencia = default(5);
+
 	double delayLimit = default (0); 			// application delay limit (0 - no limit)
 											// discard packets arriving after the limit
 

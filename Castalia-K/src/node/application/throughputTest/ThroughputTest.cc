@@ -2,7 +2,6 @@
 //#include "cstdlib"
 //#include "time.h"
 #include "Basic802154Control_m.h"
-
 Define_Module(ThroughputTest);
 
 int nPacket1 = 0,
@@ -31,6 +30,27 @@ int vetorNivelPotenciaNo[] = {-1, 0, 0, 0, 0, 0};
 int vetorNivelMACNo[] = {-1, 0, 0, 0, 0, 0};
 int vetorPotencia[5];
 
+/* 
+	Este método funciona como uma interface para a estratégia que calcula a potência.
+	A variável 'politica' é que determina qual estratégia será executada. Esta variável é inicializada uma única vez.
+	O seu valor default é igual a zero, isto é, ele só retorna o valor de potência definido previamente no vetorPotencia (ver caso default do switch)
+
+	As estratégias aqui definidas partem do mesmo princípio que é explicado abaixo.
+	O vetor 'vetorNivelPotenciaNo' guarda a informação da potência de um nó.
+	Este vetor tem tamanho igual ao número de nós, assim associamos o endereço do nó à posição no vetor.
+	O nó sink, endereço 0, tem como valor -1 como default.
+	Cada nó é representado em uma posição que tem como valor o indice da potência correspondente no vetorPotencia.
+	O parâmetro 'variacao' pode assumir os valores -1, 0, 1.
+	Estes valores serão usados para incrementar ou decrementar o índice que indica a potência de determinado nó.
+
+	Desta forma com base na avaliação da taxa MAC estabelecemos níveis para a taxa MAC. 
+	Com base na alternancia entre esses níveis avaliamos se a taxaMAC piorou ou melhorou e se devemos alterar a potência.
+
+	As estratégias aqui discutidas variam na formam como elas lidam com os limites do vetor potência. São elas:
+
+	1) policyVaryPowerBetweenRange;
+	2) policyVaryPowerInCycle;
+*/
 int ThroughputTest::varyPowerLevel(int noIndex, int variacao)
 {
 	switch(politica)
@@ -46,6 +66,12 @@ int ThroughputTest::varyPowerLevel(int noIndex, int variacao)
 	}
 }
 
+/*
+	A estratégia aqui é que quando o nó atingir o extremo dos vetores, a primeira ou a última posição do vetor, 
+	ele poderá manter a posição ou retornar.
+	Por exemplo: se trabalhamos com 4 potências diferentes, com indices 0, 1, 2 e 3. 
+	Se o nó estiver transmitindo na potência indicada pelo indice 3, ele só poderá manter a mesma potência ou passar para a potência indicada pelo indice 2.
+*/
 int ThroughputTest::policyVaryPowerBetweenRange(int noIndex, int variacao)
 {
 	int indexPotenciaAnterior = vetorNivelPotenciaNo[noIndex];
@@ -61,6 +87,18 @@ int ThroughputTest::policyVaryPowerBetweenRange(int noIndex, int variacao)
 	return potencia;
 }
 
+/*
+	Neste caso, é implementado algo semelhante a um contador cíclico (operador resto aritmético).
+	Podemos dizer aqui que a potência segue em círculos para a direita ou para a esquerda.
+	Por exemplo, se ela estiver transmitindo na potência indicada pela posição 3, e a variação indicar incremento da força,
+	o calculo pode retornar a potência da posiçao 0, já que não existe posição 4.
+
+	Como o valor do indice também pode ser decrementado, a variável temporária tmp assume o valor -1 em alguns casos.
+	Por isso foi adícionado a condição "if(tmp < 0)	tmp = maxIndicePotencia - 1"
+	Observe que "maxIndicePotencia - 1" indica a última posição válida do vetor potência, então:
+		(maxIndicePotencia - 1) % maxIndicePotencia = (maxIndicePotencia - 1)
+	Assim quando tmp == -1 ou tmp < 0, o indice assume o valor da última posição válida do vetor potência.
+*/
 int ThroughputTest::policyVaryPowerInCycle(int noIndex,int variacao)
 {
 	int indexPotenciaAnterior = vetorNivelPotenciaNo[noIndex];
@@ -80,13 +118,21 @@ void ThroughputTest::startup()
 	taxa = par("taxa");
 	isSink = par("isSink");
 
+	// Indica a estratégia (ou política) adotada para variar a potência de transmissão
 	politica = par("politica");
+
+	// Indica a última posição do vetor Potência a ser considerado
+	// Se maxIndicePotencia = 3, significa que a variação da potência só vai ocorrer entre -10dBm (posição 0) e -20dBm (posição 3)
+	// veja a inicialização do vetorPotencia logo abaixo
 	maxIndicePotencia = par("maxIndicePotencia");
 	maxIndicePotencia = (maxIndicePotencia > 1) && (maxIndicePotencia <= 5) ? maxIndicePotencia : 5;
 
 	CCAthreshold = par("CCAthreshold");
 	CCAthreshold2 = par("CCAthreshold2");
 
+	// Este trecho de código precisa ser mais flexível.
+	// Como informar para a camada de aplicação quais os valores que a potência de transmissão pode assumir?
+	// Estes valores são informados para a camada física.
 	vetorPotencia[0] = par("potencia1");//-10dBm
 	vetorPotencia[1] = par("potencia2");//-12dBm
 	vetorPotencia[2] = par("potencia3");//-15dBm
@@ -452,7 +498,8 @@ int ThroughputTest::handleControlCommand(cMessage * msg){
 			}
 		}
 
-		// funcao que varia a potencia ... varyPowerLevel(int noIndex, int nivelAnterior, int variacao)
+		// funcao que varia a potencia
+		// varyPowerLevel(int noIndex, int nivelAnterior, int variacao)
 		int potencia = varyPowerLevel(indexNO, variacao);
 		trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
 		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));

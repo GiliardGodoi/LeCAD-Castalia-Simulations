@@ -5,8 +5,17 @@
 
 Define_Module(ThroughputPolicies);
 
+random_device ThroughputPolicies::rd;
+mt19937 ThroughputPolicies::gen(ThroughputPolicies::rd());
+uniform_int_distribution<> ThroughputPolicies::dis(0,4);
+
 void ThroughputPolicies::startup()
 {
+	vetorPotencia[0] = -10;
+	vetorPotencia[1] = -12;
+	vetorPotencia[2] = -15;
+	vetorPotencia[3] = -20;
+	vetorPotencia[4] = -25;
 
 	taxa = par("taxa");
 	isSink = par("isSink");
@@ -164,9 +173,12 @@ int ThroughputPolicies::handleControlCommand(cMessage * msg){
 
 	ThroughputTestControlCommand *cmd = check_and_cast <ThroughputTestControlCommand*>(msg);
 	double taxaMAC = cmd->getParameter();
+	int nroRandomico = dis(gen);
+	int potencia = vetorPotencia[nroRandomico];
+	trace() << "TAXAMAC    " << taxaMAC;
+	trace() << "RANDOMICO    " << nroRandomico << "    POTENCIA    " << potencia;
 
-	trace() << "TAXA_MAC    " << taxaMAC;
-
+	toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 	delete cmd;
 
 	return 1;

@@ -4,6 +4,7 @@
 #include "VirtualApplication.h"
 #include "ThroughputTestControl_m.h"
 #include <map>
+#include <random>
 
 using namespace std;
 
@@ -20,6 +21,7 @@ class ThroughputPolicies: public VirtualApplication {
 	int dataSN;
 	int recipientId;
 	string recipientAddress;
+	int vetorPotencia[5];
 	
 	int taxa;
 	
@@ -32,6 +34,11 @@ class ThroughputPolicies: public VirtualApplication {
 	map<long,int> packetsReceived;
 	map<long,int> bytesReceived;
 	map<long,int> packetsSent;
+
+	// RANDOM STUFF
+	static random_device rd;
+    static mt19937 gen;
+    static uniform_int_distribution<> dis;
 
  protected:
 	void startup();

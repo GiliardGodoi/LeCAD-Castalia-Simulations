@@ -12,6 +12,9 @@ energy.txt
 packets.txt
 saida.txt
 
+# ignorando arquivo de dados
+*.csv
+
 # ignorando as outras simulações padrão
 AODVTest
 BANtest

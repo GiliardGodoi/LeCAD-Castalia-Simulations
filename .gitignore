@@ -4,6 +4,7 @@ Castalia-3.3
 out
 bin
 CastaliaBin
+Castalia-K/Makefile
 
 # ignorando arquivos de dados das simulações
 Castalia-Trace.txt

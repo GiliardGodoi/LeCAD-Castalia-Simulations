@@ -7,15 +7,16 @@ Define_Module(ThroughputPolicies);
 
 random_device ThroughputPolicies::rd;
 mt19937 ThroughputPolicies::gen(ThroughputPolicies::rd());
-uniform_int_distribution<> ThroughputPolicies::dis(0,4);
+//uniform_int_distribution<> ThroughputPolicies::dis(0,4);
+binomial_distribution<> ThroughputPolicies::dis(4, 0.7);
 
 void ThroughputPolicies::startup()
 {
-	vetorPotencia[0] = -10;
-	vetorPotencia[1] = -12;
+	vetorPotencia[0] = -25;
+	vetorPotencia[1] = -20;
 	vetorPotencia[2] = -15;
-	vetorPotencia[3] = -20;
-	vetorPotencia[4] = -25;
+	vetorPotencia[3] = -12;
+	vetorPotencia[4] = -10;
 
 	taxa = par("taxa");
 	isSink = par("isSink");

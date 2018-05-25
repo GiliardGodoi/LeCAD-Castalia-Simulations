@@ -38,7 +38,8 @@ class ThroughputPolicies: public VirtualApplication {
 	// RANDOM STUFF
 	static random_device rd;
     static mt19937 gen;
-    static uniform_int_distribution<> dis;
+    //static uniform_int_distribution<> dis;
+	static binomial_distribution<> dis;
 
  protected:
 	void startup();

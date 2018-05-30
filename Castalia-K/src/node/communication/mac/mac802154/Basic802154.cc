@@ -1081,7 +1081,7 @@ int Basic802154::handleControlCommand(cMessage * msg){
 	trace() << "Chegou prioridade "<<kindMsg;
 	if(kindMsg == 1){
 		macMaxFrameRetries = (int)parameterMsg;
-		macMaxFrameRetries = (int)1;
+		//macMaxFrameRetries = (int)1;
 		//trace() << "Tentativas "<<macMaxFrameRetries;
 	}
 	delete cmd;

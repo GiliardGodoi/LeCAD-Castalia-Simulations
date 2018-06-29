@@ -8,7 +8,7 @@ Define_Module(ThroughputPolicies);
 random_device ThroughputPolicies::rd;
 mt19937 ThroughputPolicies::gen(ThroughputPolicies::rd());
 //uniform_int_distribution<> ThroughputPolicies::dis(0,4);
-binomial_distribution<> ThroughputPolicies::dis(4, 0.7);
+binomial_distribution<> ThroughputPolicies::dis(4, 0.9);
 
 void ThroughputPolicies::startup()
 {
@@ -137,6 +137,7 @@ void ThroughputPolicies::handleRadioControlMessage(RadioControlMessage *radioMsg
 }
 
 void ThroughputPolicies::finishSpecific() {
+	declareOutput("Packets sent");
 	declareOutput("Packets reception rate");
 	declareOutput("Packets loss rate");
 
@@ -153,6 +154,7 @@ void ThroughputPolicies::finishSpecific() {
 			if (packetsSent > 0) { // this node sent us some packets
 				float rate = (float)packetsReceived[i]/packetsSent;
 				trace()<<"Pacotesrecebidos " <<i<<" "<<packetsReceived[i]<< " Pacotestransmitidos "<<packetsSent<<" Rate "<<rate;
+				collectOutput("Packets sent",i,"total",packetsSent);
 				collectOutput("Packets reception rate", i, "total", rate);
 				collectOutput("Packets loss rate", i, "total", 1-rate);
 			}
@@ -176,11 +178,12 @@ int ThroughputPolicies::handleControlCommand(cMessage * msg){
 	double taxaMAC = cmd->getParameter();
 	int nroRandomico = dis(gen);
 	int potencia = vetorPotencia[nroRandomico];
+
+	toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
+	
 	trace() << "TAXAMAC    " << taxaMAC;
 	trace() << "RANDOMICO    " << nroRandomico << "    POTENCIA    " << potencia;
 
-	toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 	delete cmd;
-
 	return 1;
 }

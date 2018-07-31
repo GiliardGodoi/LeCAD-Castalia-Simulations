@@ -557,7 +557,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 				break;
 
 			// otherwise, generate and send an ACK
-			//trace() << "Recebeu pacote " << rcvPacket->getSrcID() << ". RSSI " << rssi << " LQI " << lqi;
+			trace() << "Recebeu pacote " << rcvPacket->getSeqNum() << " No " << rcvPacket->getSrcID() << " RSSI " << rssi << " LQI " << lqi;
 			Basic802154Packet *ackPacket = new Basic802154Packet("Ack packet", MAC_LAYER_PACKET);
 			ackPacket->setPANid(SELF_MAC_ADDRESS);
 			ackPacket->setMac802154PacketType(MAC_802154_ACK_PACKET);
@@ -581,7 +581,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, double lqi)
 {
 	if (currentPacket == NULL) {
-//		trace() << "WARNING received ACK packet while currentPacket == NULL";
+		trace() << "WARNING received ACK packet while currentPacket == NULL";
 		return;
 	}
 		
@@ -596,7 +596,8 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 				desyncTime += getClock() - desyncTimeStart;
 				desyncTimeStart = -1;
 			}
-//			trace() << "Associated with PAN:" << associatedPAN;
+			// Pacote 0 é recebido como associado a PAN
+			trace() << "ACK Associated with PAN:" << associatedPAN;
 			setMacState(MAC_STATE_CAP);
 			clearCurrentPacket("Success",true);
 			connectedToPAN_node();
@@ -608,16 +609,12 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 			if (currentPacket->getSeqNum() == rcvPacket->getSeqNum()) {
 				trace() << "Data packet successfully transmitted to " << rcvPacket->getSrcID() << ", local clock " << getClock();
 				clearCurrentPacket("Success",true);
-				//trace() << "Ack recebido, RSSI "<< rssi << " LQI " << lqi;
-				trace() << "Packet count " << getPacketCount() << " ACK count " << getAckCount();
-				if(getAckCount() < 1 && SELF_MAC_ADDRESS != 0){
+				if(SELF_MAC_ADDRESS != 0){
 					countAck();  // conta acks recebidos		
+					trace() << "Ack recebido " << rcvPacket->getSeqNum() << " RSSI " << rssi << " LQI " << lqi;
+					trace() << "Packet count " << getPacketCount() << " ACK count " << getAckCount();
+
 				}		
-				if(getPacketCount() >= janela && SELF_MAC_ADDRESS != 0){ // verifica se a janela termninou				
-					trace() << "Janela MAC "<< getAckCount()*100; // mostra o resultado
-					sendCommand(getAckCount()*100);
-					limpaJanela(); // limpa dados da janela
-				}
 				
 			} else {
 				collectPacketHistory("NoAck");
@@ -633,7 +630,7 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 		}
 
 		default:{
-//			trace() << "WARNING: received unexpected ACK to packet [" << currentPacket->getName() << "]";
+			trace() << "WARNING: received unexpected ACK to packet [" << currentPacket->getName() << "]";
 			break;
 		}
 	}
@@ -706,10 +703,17 @@ void Basic802154::attemptTransmission(const char * descr)
 	
 	if (currentPacket) {
 		if (macState == MAC_STATE_GTS) {	
-//			trace() << "Transmitting [" << currentPacket->getName() << "] in GTS";
+			trace() << "Transmitting [" << currentPacket->getName() << "] in GTS";
 			transmitCurrentPacket();			
 		} else if (macState == MAC_STATE_CAP && currentPacketGtsOnly == false) {
-//			trace() << "Transmitting [" << currentPacket->getName() << "] in CAP, starting CSMA_CA";
+			trace() << "Transmitting [" << currentPacket->getName() << "] in CAP, starting CSMA_CA";
+			trace() << "DestinoPkt " << currentPacket->getSequenceNumber();  
+//			countTransmitions();
+//			if(getPacketCount() == janela && SELF_MAC_ADDRESS != 0){ // verifica se a janela termninou				
+//				trace() << "Janela MAC "<< getAckCount()*100; // mostra o resultado
+//				sendCommand(getAckCount()*100);
+//				limpaJanela(); // limpa dados da janela				
+//			}	
 			NB = 0;
 			CW = enableSlottedCSMA ? 2 : 1;
 			BE = batteryLifeExtention ? (macMinBE < 2 ? macMinBE : 2) : macMinBE;
@@ -717,13 +721,6 @@ void Basic802154::attemptTransmission(const char * descr)
 		} else {
 //			trace() << "Skipping transmission attempt in CAP due to GTSonly flag";
 		}
-		trace() << "Transmitting [" << currentPacket->getName() << "]";
-		trace() << "DestinoPkt " << currentPacket->getSequenceNumber();  
-
-		if(getPacketCount() < janela && SELF_MAC_ADDRESS != 0){ // verifica se a janela termninou				
-			countTransmitions();	
-		}
-
 //		trace() << "Packet countTransmisstion " << getPacketCount();
 	} else {
 //		trace() << "Nothing to transmit";
@@ -781,11 +778,17 @@ void Basic802154::transmitCurrentPacket()
 		//decrement retry counter, set transmission end timer and modify mac and radio states.
 //		if (lastValue > 70){
 			currentPacketRetries--;
-//		trace() << "Transmitting [" << currentPacket->getName() << "] now, remaining attempts " << currentPacketRetries;
+			trace() << "Transmitting [" << currentPacket->getName() << "] now, remaining attempts " << currentPacketRetries;
 			setTimer(currentPacketResponse > 0 ? ACK_TIMEOUT : ATTEMPT_TX, txTime);
 			toRadioLayer(currentPacket->dup());
 			toRadioLayer(createRadioCommand(SET_STATE, TX));
-			//countTransmitions();
+			countTransmitions();
+			trace() << "PacketCount " << getPacketCount();
+			if(getPacketCount() == janela && SELF_MAC_ADDRESS != 0){ // verifica se a janela termninou				
+				trace() << "Janela MAC "<< getAckCount()*100; // mostra o resultado
+				sendCommand(getAckCount()*100);
+				limpaJanela(); // limpa dados da janela				
+			}
 //		}
 	} else {
 		//transmission not allowed
@@ -1078,8 +1081,8 @@ int Basic802154::handleControlCommand(cMessage * msg){
 	trace() << "Chegou prioridade "<<kindMsg;
 	if(kindMsg == 1){
 		macMaxFrameRetries = (int)parameterMsg;
-//		macMaxFrameRetries = (int)1;
-		trace() << "Tentativas "<<macMaxFrameRetries;
+		//macMaxFrameRetries = (int)1;
+		//trace() << "Tentativas "<<macMaxFrameRetries;
 	}
 	delete cmd;
 	return 1;

@@ -4,6 +4,7 @@ Castalia-3.3
 out
 bin
 CastaliaBin
+Castalia-K/Makefile
 
 # ignorando arquivos de dados das simulações
 Castalia-Trace.txt
@@ -11,6 +12,9 @@ breakdown.txt
 energy.txt
 packets.txt
 saida.txt
+
+# ignorando arquivo de dados
+*.csv
 
 # ignorando as outras simulações padrão
 AODVTest

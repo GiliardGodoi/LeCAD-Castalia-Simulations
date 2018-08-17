@@ -469,6 +469,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 			attemptTransmission("CAP started");
 			setTimer(FRAME_START, baseSuperframeDuration * (1 << beaconOrder) *
 				 symbolLen - guardTime - offset);
+			trace() << "Beacon recebido " << " RSSI " << rssi << " LQI " << lqi;
 			break;
 		}
 

@@ -12,9 +12,9 @@ echo "Executando simulação\n"
 #Castalia -c General,ZigBeeMAC,setRate,setInterferenceModel,traceFromApp,traceFromMac -r 100 -o saida.txt
 Castalia -c General,ZigBeeMAC,setRate,varyInterferenceModel,traceFromApp,traceFromMac -r 1 -o saida.txt
 
-#echo "EXECUTANDO awk\n"
-#awk -f janelaMAC.awk Castalia-Trace.txt > dataTaxaMacFromMacLayer.csv
-#awk -f taxamac.awk Castalia-Trace.txt > dataTaxaMacFromAppLayer.csv
+# echo "EXECUTANDO awk\n"
+# awk -f janelaMAC.awk Castalia-Trace.txt > dataTaxaMacFromMacLayer.csv
+# awk -f taxamac.awk Castalia-Trace.txt > dataTaxaMacFromAppLayer.csv
 
 # echo "CAPTURANDO DADOS CastaliaResults\n"
 

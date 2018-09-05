@@ -3,12 +3,7 @@
 #include "ThroughputTestControl_m.h"
 
 // This module is virtual and can not be used directly
-Define_Module(Basic802154); 
-
-int numPacket1 = 0, numPacket2 = 0, numPacket3 = 0, numPacket4 = 0, numPacket5 = 0, numPacket0 = 0,
-ntPacket1 = 0, ntPacket2 = 0, ntPacket3 = 0, ntPacket4 = 0, ntPacket5 = 0, ntPacket0 = 0,
-ack1 = 0, ack2 = 0, ack3 = 0, ack4 = 0, ack5 = 0;
-double lastValue = 70;
+Define_Module(Basic802154);
 
 void Basic802154::startup()
 {
@@ -23,9 +18,14 @@ void Basic802154::startup()
 	isPANCoordinator = par("isPANCoordinator");
 	isFFD = par("isFFD");
 
-	limSuperior = par("limSuperior");
-	limInferior = par("limInferior");
 	janela = par("janela");
+
+	ackCount = 0;
+	packetCount = 0;
+	sequenceRecordTaxaMAC = 0;
+
+	totalPackets = 0;
+	totalAcks = 0;
 
 	// CAP-related parameters
 	minCAPLength = par("minCAPLength");
@@ -191,6 +191,7 @@ void Basic802154::timerFiredCallback(int index)
 		
 		// packet was not received
 		case ACK_TIMEOUT: {
+			setAckResult(0); // UM para sucesso e ZERO para falha
 			collectPacketHistory("NoAck");
 			attemptTransmission("ACK timeout");
 			break;
@@ -261,8 +262,9 @@ void Basic802154::timerFiredCallback(int index)
 	}
 }
 
-/* A packet is received from upper layer (Network)
- */
+/*
+	A packet is received from upper layer (Network)
+*/
 void Basic802154::fromNetworkLayer(cPacket * pkt, int dstMacAddress)
 {
 	Basic802154Packet *macPacket = new Basic802154Packet("802.15.4 MAC data packet", MAC_LAYER_PACKET);
@@ -280,12 +282,6 @@ void Basic802154::finishSpecific()
 {
 
 	string temporario;	
-
-	trace()<<"ACKrecebido "<<SELF_MAC_ADDRESS<<" = "<<getAckCount();
-	trace()<<"Pacotestransmitidos "<<SELF_MAC_ADDRESS<<" = "<<getCountTransmitions();
-	limpaCountTransmitions();
-	
- 	limpaJanela();
 
 	if (currentPacket)
 		cancelAndDelete(currentPacket);
@@ -319,8 +315,16 @@ void Basic802154::finishSpecific()
 			trace() << "Unknown packet breakdonw category: " <<
 				iter->first << " with " << iter->second << " packets";
 		}
-		trace()<<temporario<<iter->second;
+		// trace()<<temporario<<iter->second;
 	}
+
+	declareOutput("TaxaMAC evaluation");
+	collectOutput("TaxaMAC evaluation", "Total, total ACKS", totalAcks);
+	collectOutput("TaxaMAC evaluation", "Total, total Packets", totalPackets);
+	
+	collectOutput("TaxaMAC evaluation", "Counter, countACK", ackCount);
+	collectOutput("TaxaMAC evaluation", "Counter, packetCount", packetCount);
+	collectOutput("TaxaMAC evaluation", "Counter, recorded taxaMAC", sequenceRecordTaxaMAC);
 
 	if (!isPANCoordinator) {
 		if (desyncTime > 0) {
@@ -369,46 +373,30 @@ Basic802154Packet *Basic802154::newGtsRequest(int PANid, int slots) {
 	return result;
 }
 
-void Basic802154::sendCommand(double rssi){
+void Basic802154::sendCommand(double taxaMAC){
 	ThroughputTestControlCommand *cmd = new ThroughputTestControlCommand("ThroughputTest control command", APPLICATION_CONTROL_COMMAND);
 	cmd->setThroughputTestCommandKind (SET_RATE);
-	cmd->setParameter(rssi);
-//	if(70 > (lastValue*0.8)){		
-//		trace() << "MAC diminui APP " << SET_RATE << " " << lastValue;
-//		cmd->setParameter(89.9);
-//	}else{
-//		trace() << "MAC aumenta APP " << SET_RATE << " " << lastValue;
-//		cmd->setParameter(78.7);
-//	}
+	cmd->setParameter(taxaMAC);
+
 	toNetworkLayer(cmd);
 }
 
-double Basic802154::calculateLastValue(double rssi, double lqi)
-{
-//	return lastValue = (lastValue+sqrt(rssi*rssi+lqi*lqi))/2;
-	return lastValue = sqrt(rssi*rssi+lqi*lqi);
-}
 
-
-/* This function will handle a MAC frame received from the lower layer (physical or radio)
- */
+/*
+ This function will handle a MAC frame received from the lower layer (physical or radio)
+*/
 void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 {
-
-	lastValue = calculateLastValue(rssi,lqi);
-	//trace() << "Valor= " << lastValue;
-
-//	if(SELF_MAC_ADDRESS!=0 && rssi < limSuperior || rssi > limInferior)
-//	if (SELF_MAC_ADDRESS!=0 && lastValue < 75)
-//		sendCommand(rssi);
 
 	Basic802154Packet *rcvPacket = dynamic_cast<Basic802154Packet*>(pkt);
 	if (!rcvPacket) {
 		return;
 	}
 
+	//This piece of code, we can handle the promiscuous mode 
 	if (rcvPacket->getDstID() != SELF_MAC_ADDRESS && 
 			rcvPacket->getDstID() != BROADCAST_MAC_ADDRESS) {
+		
 		return;
 	}
 
@@ -608,15 +596,12 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 		//received an ack while waiting for a response to data packet
 		case MAC_802154_DATA_PACKET: {
 			if (currentPacket->getSeqNum() == rcvPacket->getSeqNum()) {
+				if(SELF_MAC_ADDRESS != 0){
+					setAckResult(1); // UM para sucesso e ZERO para falha
+					trace() << "ACK from packet # " << rcvPacket->getSeqNum() << " RSSI " << rssi << " LQI " << lqi;
+				}
 				trace() << "Data packet successfully transmitted to " << rcvPacket->getSrcID() << ", local clock " << getClock();
 				clearCurrentPacket("Success",true);
-				if(SELF_MAC_ADDRESS != 0){
-					countAck();  // conta acks recebidos		
-					trace() << "Ack recebido " << rcvPacket->getSeqNum() << " RSSI " << rssi << " LQI " << lqi;
-					trace() << "Packet count " << getPacketCount() << " ACK count " << getAckCount();
-
-				}		
-				
 			} else {
 				collectPacketHistory("NoAck");
 				attemptTransmission("Wrong SeqNum in Ack");
@@ -709,12 +694,7 @@ void Basic802154::attemptTransmission(const char * descr)
 		} else if (macState == MAC_STATE_CAP && currentPacketGtsOnly == false) {
 			trace() << "Transmitting [" << currentPacket->getName() << "] in CAP, starting CSMA_CA";
 			trace() << "DestinoPkt " << currentPacket->getSequenceNumber();  
-//			countTransmitions();
-//			if(getPacketCount() == janela && SELF_MAC_ADDRESS != 0){ // verifica se a janela termninou				
-//				trace() << "Janela MAC "<< getAckCount()*100; // mostra o resultado
-//				sendCommand(getAckCount()*100);
-//				limpaJanela(); // limpa dados da janela				
-//			}	
+
 			NB = 0;
 			CW = enableSlottedCSMA ? 2 : 1;
 			BE = batteryLifeExtention ? (macMinBE < 2 ? macMinBE : 2) : macMinBE;
@@ -722,7 +702,6 @@ void Basic802154::attemptTransmission(const char * descr)
 		} else {
 //			trace() << "Skipping transmission attempt in CAP due to GTSonly flag";
 		}
-//		trace() << "Packet countTransmisstion " << getPacketCount();
 	} else {
 //		trace() << "Nothing to transmit";
 	}
@@ -759,8 +738,9 @@ void Basic802154::transmitCurrentPacket()
 	//check if transmission is allowed given current time and tx time
 	simtime_t txTime = TX_TIME(currentPacket->getByteLength()) + currentPacketResponse;
 	simtime_t txEndTime = getClock() + txTime;
-	int allowTx = 1;
+	int allowTx = 1; // allow transmition
 	
+	//verifies if there is enough time to complete the transmission
 	if (macState == MAC_STATE_CAP) {	//currently in CAP
 		if (currentFrameStart + CAPend < txEndTime && CAPend != GTSstart)
 			//transmission will not fit in CAP 
@@ -775,22 +755,18 @@ void Basic802154::transmitCurrentPacket()
 		if (currentPacket->getMac802154PacketType() == MAC_802154_DATA_PACKET) {
 			if (macState == MAC_STATE_CAP) collectOutput("pkt TX state breakdown", "Contention");
 			else collectOutput("pkt TX state breakdown", "Contention-free");
+
+			//Count the transmissions for taxaMAC rate, only if the packet is a DATA_PACKET
+			countPacketTransmission();
 		}
 		//decrement retry counter, set transmission end timer and modify mac and radio states.
-//		if (lastValue > 70){
-			currentPacketRetries--;
-			trace() << "Transmitting [" << currentPacket->getName() << "] now, remaining attempts " << currentPacketRetries;
-			setTimer(currentPacketResponse > 0 ? ACK_TIMEOUT : ATTEMPT_TX, txTime);
-			toRadioLayer(currentPacket->dup());
-			toRadioLayer(createRadioCommand(SET_STATE, TX));
-			countTransmitions();
-			trace() << "PacketCount " << getPacketCount();
-			if(getPacketCount() == janela && SELF_MAC_ADDRESS != 0){ // verifica se a janela termninou				
-				trace() << "Janela MAC "<< getAckCount()*100; // mostra o resultado
-				sendCommand(getAckCount()*100);
-				limpaJanela(); // limpa dados da janela				
-			}
-//		}
+		currentPacketRetries--;
+		trace() << "Transmitting [" << currentPacket->getName() << "] now, remaining attempts " << currentPacketRetries;
+		setTimer(currentPacketResponse > 0 ? ACK_TIMEOUT : ATTEMPT_TX, txTime);
+		toRadioLayer(currentPacket->dup());
+		toRadioLayer(createRadioCommand(SET_STATE, TX));
+
+		trace() << "PacketCount " << getPacketCount();
 	} else {
 		//transmission not allowed
 //		trace() << "txTime " << txTime << " CAP:" << (currentFrameStart + CAPend - getClock()) << 
@@ -798,231 +774,6 @@ void Basic802154::transmitCurrentPacket()
 //		trace() << "Transmission of [" << currentPacket->getName() << "] stopped, not enough time";
 	}
 }
-
-
-void Basic802154::limpaJanela(){
-	switch (SELF_MAC_ADDRESS) {
-			case 1:{		
-				//trace() << " ack " << ack1 << " packet " << numPacket1;	
-				ack1=0;
-				numPacket1=0;
-				break;
-			}
-
-			case 2:{
-				//trace() << " ack " << ack2 << " packet " << numPacket2;	
-				ack2=0;
-				numPacket2=0;
-				break;
-			}
-			case 3:{
-				//trace() << " ack " << ack3 << " packet " << numPacket3;	
-				ack3=0;
-				numPacket3=0;
-				break;
-			}
-			case 4:{
-				//trace() << " ack " << ack4 << " packet " << numPacket4;	
-				ack4=0;
-				numPacket4=0;
-				break;
-			}
-			case 5:{
-				//trace() << " ack " << ack5 << " packet " << numPacket5;	
-				ack5=0;
-				numPacket5=0;
-				break;
-			}
-		}
-}
-
-float Basic802154::getAckCount(){
-	switch (SELF_MAC_ADDRESS) {
-			case 1:{
-				return (float) ack1/numPacket1;
-				//return (float) ack1/janela;
-				//return (float) ack1;
-				break;
-			}
-
-			case 2:{
-				return (float) ack2/numPacket2;	
-				//return (float) ack2/janela;
-				//return (float) ack2;
-				break;
-			}
-			case 3:{
-				return (float) ack3/numPacket3;
-				//return (float) ack3/janela;
-				//return (float) ack3;
-				break;
-			}
-			case 4:{
-				return (float) ack4/numPacket4;
-				//return (float) ack4/janela;
-				//return (float) ack4;
-				break;
-			}
-			case 5:{
-				return (float) ack5/numPacket5;
-				//return (float) ack5/janela;
-				//return (float) ack5;
-				break;
-			}
-		}
-}
-
-int Basic802154::getPacketCount(){
-	switch (SELF_MAC_ADDRESS) {
-			case 1:{		
-				return numPacket1;
-				break;
-			}
-
-			case 2:{
-				return numPacket2;
-				break;
-			}
-			case 3:{
-				return numPacket3;
-				break;
-			}
-			case 4:{
-				return numPacket4;
-				break;
-			}
-			case 5:{
-				return numPacket5;
-				break;
-			}
-		}
-}
-
-void Basic802154::countTransmitions(){
-	switch (SELF_MAC_ADDRESS) {
-			case 1:{			
-				ntPacket1++;
-				numPacket1++;
-				break;
-			}
-
-			case 2:{
-				ntPacket2++;
-				numPacket2++;
-				break;
-			}
-			case 3:{
-				ntPacket3++;
-				numPacket3++;
-				break;
-			}
-			case 4:{
-				ntPacket4++;
-				numPacket4++;
-				break;
-			}
-			case 5:{
-				ntPacket5++;
-				numPacket5++;
-				break;
-			}
-			case 0:{
-				ntPacket0++;
-				numPacket0++;
-				break;
-			}
-		}
-}
-
-int Basic802154::getCountTransmitions(){
-	switch (SELF_MAC_ADDRESS) {
-			case 1:{		
-				return ntPacket1;
-				break;
-			}
-
-			case 2:{
-				return ntPacket2;
-				break;
-			}
-			case 3:{
-				return ntPacket3;
-				break;
-			}
-			case 4:{
-				return ntPacket4;
-				break;
-			}
-			case 5:{
-				return ntPacket5;
-				break;
-			}
-			case 0:{
-				return ntPacket0;
-				break;
-			}
-		}
-}
-
-void Basic802154::limpaCountTransmitions(){
-switch (SELF_MAC_ADDRESS) {
-			case 1:{		
-				ntPacket1=0;
-				break;
-			}
-
-			case 2:{
-				ntPacket2=0;
-				break;
-			}
-			case 3:{
-				ntPacket3=0;
-				break;
-			}
-			case 4:{
-				ntPacket4=0;
-				break;
-			}
-			case 5:{
-				ntPacket5=0;
-				break;
-			}
-			case 0:{
-				ntPacket0=0;
-				break;
-			}
-		}
-}
-
-void Basic802154::countAck(){
-	switch (SELF_MAC_ADDRESS) {
-			case 1:{			
-				ack1++;
-				trace()<<" ack1 "<< ack1;
-				break;
-			}
-
-			case 2:{
-				ack2++;
-				break;
-			}
-			case 3:{
-				ack3++;
-				break;
-			}
-			case 4:{
-				ack4++;
-				break;
-			}
-			case 5:{
-				ack5++;
-				break;
-			}
-		}
-}
-
-
-
 
 // String s represents an outcome of most recent transmission attempt for 
 // current packet, it is saved (appended) to the final packet history
@@ -1087,4 +838,97 @@ int Basic802154::handleControlCommand(cMessage * msg){
 	}
 	delete cmd;
 	return 1;
+}
+
+/**
+ * Methods to evaluate taxaMAC.
+ * 
+ * 
+*/
+
+void Basic802154::countPacketTransmission(){
+	packetCount += 1;
+}
+
+int Basic802154::getPacketCount(){
+	return packetCount;
+}
+
+void Basic802154::resetPacketCount(){
+	
+	totalPackets += packetCount;
+	packetCount = 0;
+}
+
+void Basic802154::setAckResult(int ack){
+	// verificar se result é igual a ZERO ou UM
+
+	ackCount += ack;
+
+	if(isWindowReached() && SELF_MAC_ADDRESS != 0){
+		 evaluateTaxaMac();
+	}
+}
+
+int Basic802154::getAckCount(){
+	return ackCount;
+}
+
+void Basic802154::resetAckCounter(){
+	
+	totalAcks += ackCount;
+	ackCount = 0;
+}
+
+void Basic802154::countTaxaMacRecord(){
+	sequenceRecordTaxaMAC += 1;
+}
+
+void Basic802154::evaluateTaxaMac(){
+	int totalAck = getAckCount();
+	int totalPackets = getPacketCount();
+
+
+	trace() << "packetCount  " << getPacketCount() << "  ackCount  " << getAckCount();
+
+	float taxaMAC = (float)totalAck/totalPackets;
+	taxaMAC *= 100;
+
+	handleTaxaMac(taxaMAC);
+	
+	resetPacketCount();
+	resetAckCounter();
+	countTaxaMacRecord();
+}
+
+bool Basic802154::isWindowReached(){
+	return getPacketCount() == janela;
+}
+
+void Basic802154::handleTaxaMac(float taxaMAC){
+
+	trace() << "Janela taxaMAC  " << taxaMAC;
+	sendCommand(taxaMAC);
+}
+
+/*--- Rewrite method from VirtualMac ---*/
+int Basic802154::bufferPacket(cPacket * rcvFrame)
+{
+	if ((int)TXBuffer.size() >= macBufferSize) {
+		// It seems delete the  received frame or packet, 
+		cancelAndDelete(rcvFrame); 
+		// send a control message to the upper layer
+		MacControlMessage *fullBuffMsg =
+		    new MacControlMessage("MAC buffer full", MAC_CONTROL_MESSAGE);
+		fullBuffMsg->setMacControlMessageKind(MAC_BUFFER_FULL);
+		send(fullBuffMsg, "toNetworkModule");
+		return 0;
+	} else {
+		TXBuffer.push(rcvFrame);
+		trace() << "Packet buffered from network layer, buffer state: "
+		    << TXBuffer.size() << "/" << macBufferSize;
+
+		trace() << "CurrentBufferState    " << TXBuffer.size();
+		return 1;
+	}
 }

@@ -12,10 +12,6 @@ simple Basic802154 like node.communication.mac.iMac {
 	int macPacketOverhead = default (14);
 	int macBufferSize = default (32);
 
-	int limSuperior = default(-80);
-	int limInferior = default(-60);
-	int janela = default(5);
-
 	bool enableSlottedCSMA = default (true);
 	bool isFFD = default (false);
 	bool isPANCoordinator = default (false);
@@ -45,6 +41,14 @@ simple Basic802154 like node.communication.mac.iMac {
 
 	//reception guard time, in ms
 	double guardTime = default (1);
+
+	int janela = default(5);
+	int ackCount = default(0);
+	int packtCount  = default(0);
+	int sequenceRecordTaxaMAC = default(0);
+
+	int totalPackets  = default(0);
+	int totalAcks = default(0);
 
  gates:
 	output toNetworkModule;

@@ -50,7 +50,8 @@ int VirtualMac::handleRadioControlMessage(cMessage * msg)
 int VirtualMac::bufferPacket(cPacket * rcvFrame)
 {
 	if ((int)TXBuffer.size() >= macBufferSize) {
-		cancelAndDelete(rcvFrame);
+		// It seems delete the  received frame or packet, 
+		cancelAndDelete(rcvFrame); 
 		// send a control message to the upper layer
 		MacControlMessage *fullBuffMsg =
 		    new MacControlMessage("MAC buffer full", MAC_CONTROL_MESSAGE);

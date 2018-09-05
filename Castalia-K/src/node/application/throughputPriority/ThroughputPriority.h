@@ -3,6 +3,7 @@
 
 #include "VirtualApplication.h"
 #include "ThroughputTestControl_m.h"
+#include "ThroughputPriorityMsg_m.h"
 #include <map>
 
 using namespace std;

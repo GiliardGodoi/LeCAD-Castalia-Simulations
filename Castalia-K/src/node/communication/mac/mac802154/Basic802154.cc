@@ -209,6 +209,7 @@ void Basic802154::timerFiredCallback(int index)
 			if (macState == MAC_STATE_GTS || macState == MAC_STATE_SLEEP) break;
 			CCA_result CCAcode = radioModule->isChannelClear();
 			if (CCAcode == CLEAR) {
+				trace() << "CCA is clear, CW  " << CW;
 				//Channel clear
 				if (--CW > 0) {
 					setTimer(PERFORM_CCA, unitBackoffPeriod * symbolLen);
@@ -273,7 +274,7 @@ void Basic802154::fromNetworkLayer(cPacket * pkt, int dstMacAddress)
 											//but we are not using short addresses in this model
 	macPacket->setDstID(dstMacAddress);
 	macPacket->setMac802154PacketType(MAC_802154_DATA_PACKET);
-	macPacket->setSeqNum(seqNum++);
+	macPacket->setSeqNum(seqNum++); // Atribui um número de sequência da camada MAC
 	if (seqNum > 255) seqNum == 0;
 	if (!acceptNewPacket(macPacket)) packetoverflow++;
 }
@@ -341,7 +342,8 @@ void Basic802154::finishSpecific()
 }
 
 
-/* Helper function to change internal MAC state and print a debug statement if neccesary 
+/* 
+    Helper function to change internal MAC state and print a debug statement if neccesary 
  */
 void Basic802154::setMacState(int newState)
 {
@@ -457,6 +459,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 			attemptTransmission("CAP started");
 			setTimer(FRAME_START, baseSuperframeDuration * (1 << beaconOrder) *
 				 symbolLen - guardTime - offset);
+			
 			trace() << "Beacon recebido " << " RSSI " << rssi << " LQI " << lqi;
 			break;
 		}
@@ -546,7 +549,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 				break;
 
 			// otherwise, generate and send an ACK
-			trace() << "Recebeu pacote " << rcvPacket->getSeqNum() << " No " << rcvPacket->getSrcID() << " RSSI " << rssi << " LQI " << lqi;
+			trace() << "received packet " << rcvPacket->getSeqNum() << " from node " << rcvPacket->getSrcID() << " RSSI " << rssi << " LQI " << lqi;
 			Basic802154Packet *ackPacket = new Basic802154Packet("Ack packet", MAC_LAYER_PACKET);
 			ackPacket->setPANid(SELF_MAC_ADDRESS);
 			ackPacket->setMac802154PacketType(MAC_802154_ACK_PACKET);
@@ -554,6 +557,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 			ackPacket->setSeqNum(rcvPacket->getSeqNum());
 			ackPacket->setByteLength(ACK_PKT_SIZE);
 
+			// Ack é simplesmente transmitido
 			toRadioLayer(ackPacket);
 			toRadioLayer(createRadioCommand(SET_STATE, TX));
 			setTimer(ATTEMPT_TX, TX_TIME(ACK_PKT_SIZE));
@@ -597,12 +601,13 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 		case MAC_802154_DATA_PACKET: {
 			if (currentPacket->getSeqNum() == rcvPacket->getSeqNum()) {
 				if(SELF_MAC_ADDRESS != 0){
+					trace() << "ACK from packet # " << rcvPacket->getSeqNum() << " currentPacket [PktMAC#] " << currentPacket->getSeqNum();
 					setAckResult(1); // UM para sucesso e ZERO para falha
-					trace() << "ACK from packet # " << rcvPacket->getSeqNum() << " RSSI " << rssi << " LQI " << lqi;
 				}
 				trace() << "Data packet successfully transmitted to " << rcvPacket->getSrcID() << ", local clock " << getClock();
 				clearCurrentPacket("Success",true);
-			} else {
+			} else { // atual != recebido
+				trace() << "Received ACK SeqNum# " << rcvPacket->getSeqNum() << " currentPacket [PktMAC#] " << currentPacket->getSeqNum();
 				collectPacketHistory("NoAck");
 				attemptTransmission("Wrong SeqNum in Ack");
 			}
@@ -678,7 +683,7 @@ void Basic802154::attemptTransmission(const char * descr)
 {
 	cancelTimer(ATTEMPT_TX);
 	if (macState == MAC_STATE_SLEEP || macState == MAC_STATE_SETUP) return;
-//	trace() << "Attempt transmission, description: " << descr;
+	trace() << "Attempt transmission, description: " << descr;
 	
 	// if a packet already queued for transmission - check avaliable retries and delay
 	if (currentPacket && (currentPacketRetries == 0 || (currentPacketLimit > 0 && 
@@ -692,9 +697,7 @@ void Basic802154::attemptTransmission(const char * descr)
 			trace() << "Transmitting [" << currentPacket->getName() << "] in GTS";
 			transmitCurrentPacket();			
 		} else if (macState == MAC_STATE_CAP && currentPacketGtsOnly == false) {
-			trace() << "Transmitting [" << currentPacket->getName() << "] in CAP, starting CSMA_CA";
-			trace() << "DestinoPkt " << currentPacket->getSequenceNumber();  
-
+			trace() << "Attempt transmitting [" << currentPacket->getName() << "] in CAP, starting CSMA_CA PktMAC# " << currentPacket->getSeqNum() ;
 			NB = 0;
 			CW = enableSlottedCSMA ? 2 : 1;
 			BE = batteryLifeExtention ? (macMinBE < 2 ? macMinBE : 2) : macMinBE;
@@ -721,7 +724,12 @@ void Basic802154::performCSMACA()
 		CCAtime += backoffBoundary;
 	}
 
-//	trace() << "CSMA/CA random backoff value: " << rnd << ", in " << CCAtime << " seconds";
+	
+	if(currentPacket){
+		trace() << "CSMA/CA random backoff value: " << rnd << ", in " << CCAtime << " seconds PktMAC# " << currentPacket->getSeqNum();
+	}else{
+		trace() << "CSMA/CA random backoff value: " << rnd << ", in " << CCAtime << " seconds";
+	}
 
 	//set a timer to perform carrier sense after calculated time
 	setTimer(PERFORM_CCA, CCAtime);
@@ -752,16 +760,22 @@ void Basic802154::transmitCurrentPacket()
 	}
 	
 	if (allowTx) {
+		//Antes de realizar uma transmissão vamos verificar se um intervalo de Janela já está fechado
+		if(isWindowReached() && SELF_MAC_ADDRESS != 0){
+			// Se já estiver, vamos calcular o novo valor da taxaMAC e informa-lo para a camada de aplicação.
+			evaluateTaxaMac();
+			// após isso inicia-se um novo intervalo (ou uma nova janela)
+		}
+
 		if (currentPacket->getMac802154PacketType() == MAC_802154_DATA_PACKET) {
 			if (macState == MAC_STATE_CAP) collectOutput("pkt TX state breakdown", "Contention");
 			else collectOutput("pkt TX state breakdown", "Contention-free");
-
 			//Count the transmissions for taxaMAC rate, only if the packet is a DATA_PACKET
 			countPacketTransmission();
 		}
 		//decrement retry counter, set transmission end timer and modify mac and radio states.
 		currentPacketRetries--;
-		trace() << "Transmitting [" << currentPacket->getName() << "] now, remaining attempts " << currentPacketRetries;
+		trace() << "Transmitting [" << currentPacket->getName() <<" PktMAC# " << currentPacket->getSeqNum() <<" ] now, remaining attempts " << currentPacketRetries;
 		setTimer(currentPacketResponse > 0 ? ACK_TIMEOUT : ATTEMPT_TX, txTime);
 		toRadioLayer(currentPacket->dup());
 		toRadioLayer(createRadioCommand(SET_STATE, TX));
@@ -777,7 +791,7 @@ void Basic802154::transmitCurrentPacket()
 
 // String s represents an outcome of most recent transmission attempt for 
 // current packet, it is saved (appended) to the final packet history
-void Basic802154::collectPacketHistory(const char *s)
+void Basic802154::collectPacketHistory(const char *s) // "NoAck"
 {
 	if (!currentPacket) {
 //		trace() << "WARNING: collectPacketState called while currentPacket==NULL, string:"<<s;
@@ -861,13 +875,10 @@ void Basic802154::resetPacketCount(){
 }
 
 void Basic802154::setAckResult(int ack){
-	// verificar se result é igual a ZERO ou UM
+	int tmp = ackCount;
+	ackCount = ackCount + ack;
 
-	ackCount += ack;
-
-	if(isWindowReached() && SELF_MAC_ADDRESS != 0){
-		 evaluateTaxaMac();
-	}
+	trace() << "AckCount " << ackCount << " = " << tmp << " + " << ack;
 }
 
 int Basic802154::getAckCount(){
@@ -888,11 +899,10 @@ void Basic802154::evaluateTaxaMac(){
 	int totalAck = getAckCount();
 	int totalPackets = getPacketCount();
 
-
-	trace() << "packetCount  " << getPacketCount() << "  ackCount  " << getAckCount();
-
 	float taxaMAC = (float)totalAck/totalPackets;
 	taxaMAC *= 100;
+
+	trace() << "Evaluating TaxaMAC: ackCount/pktCount  " << getAckCount() << "/" << getPacketCount() << "  =  " << taxaMAC;
 
 	handleTaxaMac(taxaMAC);
 	

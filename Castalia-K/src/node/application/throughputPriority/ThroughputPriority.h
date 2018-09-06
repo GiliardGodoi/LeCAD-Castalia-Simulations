@@ -53,9 +53,6 @@ class ThroughputPriority: public VirtualApplication {
 	int potencia5;
 	bool isSink;
 
-	int politica;
-	int maxIndicePotencia;
-
 	//variables below are used to determine the packet delivery rates.	
 	int numNodes;
 	map<long,int> packetsReceived;

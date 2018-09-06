@@ -117,15 +117,35 @@ void StaticGTS802154::assignedGTS_node(int slots) {
  * status string holds comma separated list of outcomes
  * for each transmission attempt
  ***/
-void StaticGTS802154::transmissionOutcome(Basic802154Packet *pkt, bool success, string status) {
-	if (getAssociatedPAN() != -1) {
-		if (assignedGTS == 0 && requestGTS > 0) {
-			transmitPacket(newGtsRequest(getAssociatedPAN(), requestGTS));
-		} else if (TXBuffer.size()) {
-			Basic802154Packet *packet = check_and_cast<Basic802154Packet*>(TXBuffer.front());
-			TXBuffer.pop();
-			transmitPacket(packet,0,gtsOnly);
-		}
+// void StaticGTS802154::transmissionOutcome(Basic802154Packet *pkt, bool success, string status) {
+// 	if (getAssociatedPAN() != -1) {
+// 		if (assignedGTS == 0 && requestGTS > 0) {
+// 			transmitPacket(newGtsRequest(getAssociatedPAN(), requestGTS));
+// 		} else if (TXBuffer.size()) {
+// 			Basic802154Packet *packet = check_and_cast<Basic802154Packet*>(TXBuffer.front());
+// 			TXBuffer.pop();
+// 			transmitPacket(packet,0,gtsOnly);
+// 		}
+// 	}
+// }
+
+// // A function to react to packet transmission callback
+// // ACTION: Simply transmit next packet from the buffer if associated to PAN
+// void Basic802154::transmissionOutcome(Basic802154Packet *pkt, bool success, string history) 
+// {
+// 	if (getAssociatedPAN() != -1 && TXBuffer.size()) {
+// 		Basic802154Packet *packet = check_and_cast<Basic802154Packet*>(TXBuffer.front());
+// 		TXBuffer.pop();
+// 		transmitPacket(packet);
+// 	}
+// }
+
+void StaticGTS802154::transmissionOutcome(Basic802154Packet *pkt, bool success, string history) 
+{
+	if (getAssociatedPAN() != -1 && TXBuffer.size()) {
+		Basic802154Packet *packet = check_and_cast<Basic802154Packet*>(TXBuffer.front());
+		TXBuffer.pop();
+		transmitPacket(packet);
 	}
 }
 

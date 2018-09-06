@@ -7,15 +7,6 @@ void ThroughputPriority::startup()
 	taxa = par("taxa");
 	isSink = par("isSink");
 
-	// Indica a estratégia (ou política) adotada para variar a potência de transmissão
-	politica = par("politica");
-
-	// Indica a última posição do vetor Potência a ser considerado
-	// Se maxIndicePotencia = 3, significa que a variação da potência só vai ocorrer entre -10dBm (posição 0) e -20dBm (posição 3)
-	// veja a inicialização do vetorPotencia logo abaixo
-	maxIndicePotencia = par("maxIndicePotencia");
-	maxIndicePotencia = (maxIndicePotencia > 1) && (maxIndicePotencia <= 5) ? maxIndicePotencia : 5;
-
 	CCAthreshold = par("CCAthreshold");
 	CCAthreshold2 = par("CCAthreshold2");
 
@@ -31,7 +22,6 @@ void ThroughputPriority::startup()
 	packet_spacing_safe = packet_spacing;
 //	packet_spacing = packet_rate;
 	dataSN = 0;
-	trace() << "Inicio"<<SELF_NETWORK_ADDRESS << "  politica  " << politica << "  maxIndicePotencia  " << maxIndicePotencia;
 	numNodes = getParentModule()->getParentModule()->par("numNodes");
 	packetsSent.clear();
 	packetsReceived.clear();
@@ -80,7 +70,7 @@ void ThroughputPriority::timerFiredCallback(int index)
 	int valuePriority;
 	switch (index) {
 		case SEND_PACKET:{
-		
+	
 			toNetworkLayer(createGenericDataPacket(0, dataSN), recipientAddress.c_str());
 //atoi(SELF_NETWORK_ADDRESS)
 			valuePriority = getPriority();
@@ -218,5 +208,5 @@ void ThroughputPriority::countTransmitions(){
 
 int ThroughputPriority::handleControlCommand(cMessage * msg){
 
-	 return 1;
+	 return 2;
 }

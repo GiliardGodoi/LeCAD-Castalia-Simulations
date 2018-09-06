@@ -13,9 +13,11 @@ Castalia -c General,ZigBeeMAC,setRate,setInterferenceModel,traceFromMac -r 100 -
 #Castalia -c General,ZigBeeMAC,setRate,varyInterferenceModel,traceFromApp,traceFromMac -r 1 -o saida.txt
 
 echo "EXECUTANDO awk\n"
+# awk -f janelaMAC.awk Castalia-Trace.txt > dataTaxaMacFromMacLayer.csv
+# awk -f taxamac.awk Castalia-Trace.txt > dataTaxaMacFromAppLayer.csv
+
 awk -f ../../awks/buffer.awk Castalia-Trace.txt > bufferData.csv
 awk -f ../../awks/janelaMAC.awk Castalia-Trace.txt > taxaMACData.csv
-# awk -f ../../awks/filtro.awk Castalia-Trace.txt > nodefive.txt
 
 # echo "CAPTURANDO DADOS CastaliaResults\n"
 
@@ -30,4 +32,4 @@ awk -f ../../awks/janelaMAC.awk Castalia-Trace.txt > taxaMACData.csv
 # CastaliaResults -i saida.txt -s "Remaining Energy" -n --all -o2 > energy_remaining.txt
 
 
-echo "FIM DA SIMULAÇÃO P-10"
+echo "FIM DA SIMULAÇÃO P-12"

@@ -53,24 +53,32 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
 template<typename T>
 inline std::ostream& operator<<(std::ostream& out,const T&) {return out;}
 
-Register_Class(ThroughputPriorityMsg);
+EXECUTE_ON_STARTUP(
+    cEnum *e = cEnum::find("ThroughputPriorityCommandDef");
+    if (!e) enums.getInstance()->add(e = new cEnum("ThroughputPriorityCommandDef"));
+    e->insert(TAXAMAC_INFO, "TAXAMAC_INFO");
+    e->insert(BUFFER_INFO, "BUFFER_INFO");
+);
 
-ThroughputPriorityMsg::ThroughputPriorityMsg(const char *name, int kind) : ::cMessage(name,kind)
+Register_Class(ThroghputPriorityMsg);
+
+ThroghputPriorityMsg::ThroghputPriorityMsg(const char *name, int kind) : ::cMessage(name,kind)
 {
+    this->type_var = 0;
     this->taxaMAC_var = 0;
-    this->bufferMeasure_var = 0;
+    this->bufferState_var = 0;
 }
 
-ThroughputPriorityMsg::ThroughputPriorityMsg(const ThroughputPriorityMsg& other) : ::cMessage(other)
+ThroghputPriorityMsg::ThroghputPriorityMsg(const ThroghputPriorityMsg& other) : ::cMessage(other)
 {
     copy(other);
 }
 
-ThroughputPriorityMsg::~ThroughputPriorityMsg()
+ThroghputPriorityMsg::~ThroghputPriorityMsg()
 {
 }
 
-ThroughputPriorityMsg& ThroughputPriorityMsg::operator=(const ThroughputPriorityMsg& other)
+ThroghputPriorityMsg& ThroghputPriorityMsg::operator=(const ThroghputPriorityMsg& other)
 {
     if (this==&other) return *this;
     ::cMessage::operator=(other);
@@ -78,51 +86,64 @@ ThroughputPriorityMsg& ThroughputPriorityMsg::operator=(const ThroughputPriority
     return *this;
 }
 
-void ThroughputPriorityMsg::copy(const ThroughputPriorityMsg& other)
+void ThroghputPriorityMsg::copy(const ThroghputPriorityMsg& other)
 {
+    this->type_var = other.type_var;
     this->taxaMAC_var = other.taxaMAC_var;
-    this->bufferMeasure_var = other.bufferMeasure_var;
+    this->bufferState_var = other.bufferState_var;
 }
 
-void ThroughputPriorityMsg::parsimPack(cCommBuffer *b)
+void ThroghputPriorityMsg::parsimPack(cCommBuffer *b)
 {
     ::cMessage::parsimPack(b);
+    doPacking(b,this->type_var);
     doPacking(b,this->taxaMAC_var);
-    doPacking(b,this->bufferMeasure_var);
+    doPacking(b,this->bufferState_var);
 }
 
-void ThroughputPriorityMsg::parsimUnpack(cCommBuffer *b)
+void ThroghputPriorityMsg::parsimUnpack(cCommBuffer *b)
 {
     ::cMessage::parsimUnpack(b);
+    doUnpacking(b,this->type_var);
     doUnpacking(b,this->taxaMAC_var);
-    doUnpacking(b,this->bufferMeasure_var);
+    doUnpacking(b,this->bufferState_var);
 }
 
-double ThroughputPriorityMsg::getTaxaMAC() const
+int ThroghputPriorityMsg::getType() const
+{
+    return type_var;
+}
+
+void ThroghputPriorityMsg::setType(int type)
+{
+    this->type_var = type;
+}
+
+double ThroghputPriorityMsg::getTaxaMAC() const
 {
     return taxaMAC_var;
 }
 
-void ThroughputPriorityMsg::setTaxaMAC(double taxaMAC)
+void ThroghputPriorityMsg::setTaxaMAC(double taxaMAC)
 {
     this->taxaMAC_var = taxaMAC;
 }
 
-int ThroughputPriorityMsg::getBufferMeasure() const
+double ThroghputPriorityMsg::getBufferState() const
 {
-    return bufferMeasure_var;
+    return bufferState_var;
 }
 
-void ThroughputPriorityMsg::setBufferMeasure(int bufferMeasure)
+void ThroghputPriorityMsg::setBufferState(double bufferState)
 {
-    this->bufferMeasure_var = bufferMeasure;
+    this->bufferState_var = bufferState;
 }
 
-class ThroughputPriorityMsgDescriptor : public cClassDescriptor
+class ThroghputPriorityMsgDescriptor : public cClassDescriptor
 {
   public:
-    ThroughputPriorityMsgDescriptor();
-    virtual ~ThroughputPriorityMsgDescriptor();
+    ThroghputPriorityMsgDescriptor();
+    virtual ~ThroghputPriorityMsgDescriptor();
 
     virtual bool doesSupport(cObject *obj) const;
     virtual const char *getProperty(const char *propertyname) const;
@@ -141,34 +162,34 @@ class ThroughputPriorityMsgDescriptor : public cClassDescriptor
     virtual void *getFieldStructPointer(void *object, int field, int i) const;
 };
 
-Register_ClassDescriptor(ThroughputPriorityMsgDescriptor);
+Register_ClassDescriptor(ThroghputPriorityMsgDescriptor);
 
-ThroughputPriorityMsgDescriptor::ThroughputPriorityMsgDescriptor() : cClassDescriptor("ThroughputPriorityMsg", "cMessage")
+ThroghputPriorityMsgDescriptor::ThroghputPriorityMsgDescriptor() : cClassDescriptor("ThroghputPriorityMsg", "cMessage")
 {
 }
 
-ThroughputPriorityMsgDescriptor::~ThroughputPriorityMsgDescriptor()
+ThroghputPriorityMsgDescriptor::~ThroghputPriorityMsgDescriptor()
 {
 }
 
-bool ThroughputPriorityMsgDescriptor::doesSupport(cObject *obj) const
+bool ThroghputPriorityMsgDescriptor::doesSupport(cObject *obj) const
 {
-    return dynamic_cast<ThroughputPriorityMsg *>(obj)!=NULL;
+    return dynamic_cast<ThroghputPriorityMsg *>(obj)!=NULL;
 }
 
-const char *ThroughputPriorityMsgDescriptor::getProperty(const char *propertyname) const
+const char *ThroghputPriorityMsgDescriptor::getProperty(const char *propertyname) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : NULL;
 }
 
-int ThroughputPriorityMsgDescriptor::getFieldCount(void *object) const
+int ThroghputPriorityMsgDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
+    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
 }
 
-unsigned int ThroughputPriorityMsgDescriptor::getFieldTypeFlags(void *object, int field) const
+unsigned int ThroghputPriorityMsgDescriptor::getFieldTypeFlags(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -179,11 +200,12 @@ unsigned int ThroughputPriorityMsgDescriptor::getFieldTypeFlags(void *object, in
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
 }
 
-const char *ThroughputPriorityMsgDescriptor::getFieldName(void *object, int field) const
+const char *ThroghputPriorityMsgDescriptor::getFieldName(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -192,22 +214,24 @@ const char *ThroughputPriorityMsgDescriptor::getFieldName(void *object, int fiel
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldNames[] = {
+        "type",
         "taxaMAC",
-        "bufferMeasure",
+        "bufferState",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : NULL;
+    return (field>=0 && field<3) ? fieldNames[field] : NULL;
 }
 
-int ThroughputPriorityMsgDescriptor::findField(void *object, const char *fieldName) const
+int ThroghputPriorityMsgDescriptor::findField(void *object, const char *fieldName) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
-    if (fieldName[0]=='t' && strcmp(fieldName, "taxaMAC")==0) return base+0;
-    if (fieldName[0]=='b' && strcmp(fieldName, "bufferMeasure")==0) return base+1;
+    if (fieldName[0]=='t' && strcmp(fieldName, "type")==0) return base+0;
+    if (fieldName[0]=='t' && strcmp(fieldName, "taxaMAC")==0) return base+1;
+    if (fieldName[0]=='b' && strcmp(fieldName, "bufferState")==0) return base+2;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
-const char *ThroughputPriorityMsgDescriptor::getFieldTypeString(void *object, int field) const
+const char *ThroghputPriorityMsgDescriptor::getFieldTypeString(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -216,13 +240,14 @@ const char *ThroughputPriorityMsgDescriptor::getFieldTypeString(void *object, in
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldTypeStrings[] = {
-        "double",
         "int",
+        "double",
+        "double",
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
 }
 
-const char *ThroughputPriorityMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
+const char *ThroghputPriorityMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -231,11 +256,14 @@ const char *ThroughputPriorityMsgDescriptor::getFieldProperty(void *object, int 
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
+        case 0:
+            if (!strcmp(propertyname,"enum")) return "ThroughputPriorityCommandDef";
+            return NULL;
         default: return NULL;
     }
 }
 
-int ThroughputPriorityMsgDescriptor::getArraySize(void *object, int field) const
+int ThroghputPriorityMsgDescriptor::getArraySize(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -243,13 +271,13 @@ int ThroughputPriorityMsgDescriptor::getArraySize(void *object, int field) const
             return basedesc->getArraySize(object, field);
         field -= basedesc->getFieldCount(object);
     }
-    ThroughputPriorityMsg *pp = (ThroughputPriorityMsg *)object; (void)pp;
+    ThroghputPriorityMsg *pp = (ThroghputPriorityMsg *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-std::string ThroughputPriorityMsgDescriptor::getFieldAsString(void *object, int field, int i) const
+std::string ThroghputPriorityMsgDescriptor::getFieldAsString(void *object, int field, int i) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -257,15 +285,16 @@ std::string ThroughputPriorityMsgDescriptor::getFieldAsString(void *object, int 
             return basedesc->getFieldAsString(object,field,i);
         field -= basedesc->getFieldCount(object);
     }
-    ThroughputPriorityMsg *pp = (ThroughputPriorityMsg *)object; (void)pp;
+    ThroghputPriorityMsg *pp = (ThroghputPriorityMsg *)object; (void)pp;
     switch (field) {
-        case 0: return double2string(pp->getTaxaMAC());
-        case 1: return long2string(pp->getBufferMeasure());
+        case 0: return long2string(pp->getType());
+        case 1: return double2string(pp->getTaxaMAC());
+        case 2: return double2string(pp->getBufferState());
         default: return "";
     }
 }
 
-bool ThroughputPriorityMsgDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
+bool ThroghputPriorityMsgDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -273,15 +302,16 @@ bool ThroughputPriorityMsgDescriptor::setFieldAsString(void *object, int field, 
             return basedesc->setFieldAsString(object,field,i,value);
         field -= basedesc->getFieldCount(object);
     }
-    ThroughputPriorityMsg *pp = (ThroughputPriorityMsg *)object; (void)pp;
+    ThroghputPriorityMsg *pp = (ThroghputPriorityMsg *)object; (void)pp;
     switch (field) {
-        case 0: pp->setTaxaMAC(string2double(value)); return true;
-        case 1: pp->setBufferMeasure(string2long(value)); return true;
+        case 0: pp->setType(string2long(value)); return true;
+        case 1: pp->setTaxaMAC(string2double(value)); return true;
+        case 2: pp->setBufferState(string2double(value)); return true;
         default: return false;
     }
 }
 
-const char *ThroughputPriorityMsgDescriptor::getFieldStructName(void *object, int field) const
+const char *ThroghputPriorityMsgDescriptor::getFieldStructName(void *object, int field) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -294,7 +324,7 @@ const char *ThroughputPriorityMsgDescriptor::getFieldStructName(void *object, in
     };
 }
 
-void *ThroughputPriorityMsgDescriptor::getFieldStructPointer(void *object, int field, int i) const
+void *ThroghputPriorityMsgDescriptor::getFieldStructPointer(void *object, int field, int i) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -302,7 +332,7 @@ void *ThroughputPriorityMsgDescriptor::getFieldStructPointer(void *object, int f
             return basedesc->getFieldStructPointer(object, field, i);
         field -= basedesc->getFieldCount(object);
     }
-    ThroughputPriorityMsg *pp = (ThroughputPriorityMsg *)object; (void)pp;
+    ThroghputPriorityMsg *pp = (ThroghputPriorityMsg *)object; (void)pp;
     switch (field) {
         default: return NULL;
     }

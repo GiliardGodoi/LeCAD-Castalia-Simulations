@@ -1,6 +1,7 @@
 #include "Basic802154.h"
 
 #include "ThroughputTestControl_m.h"
+#include "ThroughputPriorityMsg_m.h"
 
 // This module is virtual and can not be used directly
 Define_Module(Basic802154);
@@ -918,7 +919,26 @@ bool Basic802154::isWindowReached(){
 void Basic802154::handleTaxaMac(float taxaMAC){
 
 	trace() << "Janela taxaMAC  " << taxaMAC;
-	sendCommand(taxaMAC);
+	// sendCommand(taxaMAC);
+
+	ThroghputPriorityMsg *cmd = new ThroghputPriorityMsg("ThroughputPriorityCommand", APPLICATION_CONTROL_COMMAND);
+	cmd->setType(TAXAMAC_INFO);
+	cmd->setTaxaMAC(taxaMAC);
+	
+	toNetworkLayer(cmd);
+}
+
+void Basic802154::handleBufferMeasurement(int buffer){
+
+	trace() << "CurrentBufferState    " << buffer;
+
+	float bufferState = (float)buffer/ macBufferSize * 100;
+
+	ThroghputPriorityMsg *cmd = new ThroghputPriorityMsg("ThroughputPriorityCommand", APPLICATION_CONTROL_COMMAND);
+	cmd->setType(BUFFER_INFO);
+	cmd->setBufferState(bufferState);
+	
+	toNetworkLayer(cmd);
 }
 
 /*--- Rewrite method from VirtualMac ---*/
@@ -938,7 +958,7 @@ int Basic802154::bufferPacket(cPacket * rcvFrame)
 		trace() << "Packet buffered from network layer, buffer state: "
 		    << TXBuffer.size() << "/" << macBufferSize;
 
-		trace() << "CurrentBufferState    " << TXBuffer.size();
+		handleBufferMeasurement(TXBuffer.size());
 		return 1;
 	}
 }

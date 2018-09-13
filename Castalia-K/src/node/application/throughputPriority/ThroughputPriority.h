@@ -34,23 +34,17 @@ class ThroughputPriority: public VirtualApplication {
 	int nTime3 = 0;
 	int nTime4 = 0;
 	int nTime5 = 0;
+	
 	int packet_rate_safe;
 	int priority;
-	int potenciaFinal = 0;
+	
+	int potencia = 0;
+	int potenciaAtual = 0;
 
 	float packet_spacing_safe;
 	double taxaMAC = 0.0;
-
-	int taxa;
 	
-	double CCAthreshold;
-	double CCAthreshold2;
 
-	int potencia1;
-	int potencia2;
-	int potencia3;
-	int potencia4;
-	int potencia5;
 	bool isSink;
 
 	//variables below are used to determine the packet delivery rates.	

@@ -165,6 +165,7 @@ class Basic802154: public VirtualMac {
 	bool isWindowReached();
 
 	void handleTaxaMac(float);
+	void handleBufferMeasurement(int);
 	
 	/*--- Rewrite method from VirtualMac ---*/
 	virtual int bufferPacket(cPacket *);

@@ -4,11 +4,10 @@ Define_Module(ThroughputPriority);
 
 void ThroughputPriority::startup()
 {
-	taxa = par("taxa");
 	isSink = par("isSink");
 
-	CCAthreshold = par("CCAthreshold");
-	CCAthreshold2 = par("CCAthreshold2");
+	potencia = par("potencia");
+	potenciaAtual = potencia;
 
 	priority = par("priority");
 
@@ -109,8 +108,6 @@ void ThroughputPriority::finishSpecific() {
 	declareOutput("Packets reception rate");
 	declareOutput("Packets loss rate");
 
-	trace()<<"Pacotestransmitidospor "<<SELF_NETWORK_ADDRESS<<" = "<<getPacketCount(atoi(SELF_NETWORK_ADDRESS));
-
 	cTopology *topo;	// temp variable to access packets received by other nodes
 	topo = new cTopology("topo");
 	topo->extractByNedTypeName(cStringTokenizer("node.Node").asVector());
@@ -208,5 +205,34 @@ void ThroughputPriority::countTransmitions(){
 
 int ThroughputPriority::handleControlCommand(cMessage * msg){
 
-	 return 2;
+	ThroghputPriorityMsg *cmd = check_and_cast <ThroghputPriorityMsg*>(msg);
+
+	int INFO_TYPE = cmd->getType();
+
+	switch (INFO_TYPE) {
+		
+		case TAXAMAC_INFO : {
+			trace() << "TAXAMAC_INFO    " << cmd->getTaxaMAC();
+			break;	
+		}
+		case BUFFER_INFO : {
+			double state = cmd->getBufferState();
+			if(state > 85.0)
+			{
+				potenciaAtual = -10;
+				toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
+			}
+			else if( (state < 85.0) && (potencia != potenciaAtual))
+			{
+				potenciaAtual = potencia;
+				toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
+			}
+
+			trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual;
+			break;
+		}
+	}
+
+	delete cmd;
+	return 2;
 }

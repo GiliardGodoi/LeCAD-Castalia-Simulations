@@ -12,21 +12,10 @@ simple ThroughputPriority like node.application.iApplication {
 	int constantDataPayload = default (100);	// in bytes
 
 	int taxa = default (80);
-	double CCAthreshold = default (-95.0);   
-	double CCAthreshold2 = default (-95.0);
-
-	int potencia1 = default (-10);
-	int potencia2 = default (-12);
-	int potencia3 = default (-15);
-	int potencia4 = default (-20);
-	int potencia5 = default (-25);
+	int potencia = default(-25);
 
 	bool isSink = default(false);
-
-	int politica = default(0);
-	int maxIndicePotencia = default(5);
-
-	double delayLimit = default (0); 			// application delay limit (0 - no limit)
+	double delayLimit = default (0); 		// application delay limit (0 - no limit)
 											// discard packets arriving after the limit
 
 	string nextRecipient = default ("0");	// Destination for packets received in this node. 

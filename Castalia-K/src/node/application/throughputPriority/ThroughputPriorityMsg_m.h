@@ -16,46 +16,66 @@
 
 
 /**
- * Class generated from <tt>src/node/application/throughputPriority/ThroughputPriorityMsg.msg:1</tt> by nedtool.
+ * Enum generated from <tt>src/node/application/throughputPriority/ThroughputPriorityMsg.msg:1</tt> by nedtool.
  * <pre>
- * message ThroughputPriorityMsg
+ * enum ThroughputPriorityCommandDef
  * {
- *     double taxaMAC = 0;
- *     int bufferMeasure = 0;
+ * 
+ *     TAXAMAC_INFO = 1;
+ *     BUFFER_INFO = 2;
  * }
  * </pre>
  */
-class ThroughputPriorityMsg : public ::cMessage
+enum ThroughputPriorityCommandDef {
+    TAXAMAC_INFO = 1,
+    BUFFER_INFO = 2
+};
+
+/**
+ * Class generated from <tt>src/node/application/throughputPriority/ThroughputPriorityMsg.msg:6</tt> by nedtool.
+ * <pre>
+ * message ThroghputPriorityMsg
+ * {
+ *     int type @enum(ThroughputPriorityCommandDef);
+ *     double taxaMAC = 0;
+ *     double bufferState = 0;
+ * }
+ * </pre>
+ */
+class ThroghputPriorityMsg : public ::cMessage
 {
   protected:
+    int type_var;
     double taxaMAC_var;
-    int bufferMeasure_var;
+    double bufferState_var;
 
   private:
-    void copy(const ThroughputPriorityMsg& other);
+    void copy(const ThroghputPriorityMsg& other);
 
   protected:
     // protected and unimplemented operator==(), to prevent accidental usage
-    bool operator==(const ThroughputPriorityMsg&);
+    bool operator==(const ThroghputPriorityMsg&);
 
   public:
-    ThroughputPriorityMsg(const char *name=NULL, int kind=0);
-    ThroughputPriorityMsg(const ThroughputPriorityMsg& other);
-    virtual ~ThroughputPriorityMsg();
-    ThroughputPriorityMsg& operator=(const ThroughputPriorityMsg& other);
-    virtual ThroughputPriorityMsg *dup() const {return new ThroughputPriorityMsg(*this);}
+    ThroghputPriorityMsg(const char *name=NULL, int kind=0);
+    ThroghputPriorityMsg(const ThroghputPriorityMsg& other);
+    virtual ~ThroghputPriorityMsg();
+    ThroghputPriorityMsg& operator=(const ThroghputPriorityMsg& other);
+    virtual ThroghputPriorityMsg *dup() const {return new ThroghputPriorityMsg(*this);}
     virtual void parsimPack(cCommBuffer *b);
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
+    virtual int getType() const;
+    virtual void setType(int type);
     virtual double getTaxaMAC() const;
     virtual void setTaxaMAC(double taxaMAC);
-    virtual int getBufferMeasure() const;
-    virtual void setBufferMeasure(int bufferMeasure);
+    virtual double getBufferState() const;
+    virtual void setBufferState(double bufferState);
 };
 
-inline void doPacking(cCommBuffer *b, ThroughputPriorityMsg& obj) {obj.parsimPack(b);}
-inline void doUnpacking(cCommBuffer *b, ThroughputPriorityMsg& obj) {obj.parsimUnpack(b);}
+inline void doPacking(cCommBuffer *b, ThroghputPriorityMsg& obj) {obj.parsimPack(b);}
+inline void doUnpacking(cCommBuffer *b, ThroghputPriorityMsg& obj) {obj.parsimUnpack(b);}
 
 
 #endif // ifndef _THROUGHPUTPRIORITYMSG_M_H_

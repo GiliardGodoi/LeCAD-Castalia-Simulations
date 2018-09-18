@@ -40,6 +40,9 @@ class ThroughputPriority: public VirtualApplication {
 	
 	int potencia = 0;
 	int potenciaAtual = 0;
+	double limiarBuffer = 85.0;
+	bool utilizarTaxaBuffer = false;
+
 
 	float packet_spacing_safe;
 	double taxaMAC = 0.0;
@@ -63,6 +66,7 @@ class ThroughputPriority: public VirtualApplication {
 	int handleControlCommand(cMessage * msg);
 	void countTransmitions();
 	int getPacketCount(int node);
+	void varyPowerTransmissionByBufferState(double);
 
  public:
 	int getPacketsSent(int addr) { return packetsSent[addr]; }

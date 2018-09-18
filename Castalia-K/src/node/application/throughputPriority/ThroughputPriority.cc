@@ -8,6 +8,8 @@ void ThroughputPriority::startup()
 
 	potencia = par("potencia");
 	potenciaAtual = potencia;
+	limiarBuffer = par("limiarBuffer");
+	utilizarTaxaBuffer = par("utilizarTaxaBuffer");
 
 	priority = par("priority");
 
@@ -136,6 +138,8 @@ void ThroughputPriority::finishSpecific() {
 		collectOutput("Energy nJ/bit","",energy);
 		trace()<<"SpentEnergy "<<resMgrModule->getSpentEnergy()<<" EnergynJ/bit "<<energy;
 	}
+
+	trace() << "Potencia  " << potencia << "    PotenciaAtual    " << potenciaAtual;
 }
 
 int ThroughputPriority::getPacketCount(int node){
@@ -203,6 +207,20 @@ void ThroughputPriority::countTransmitions(){
 		}
 }
 
+void ThroughputPriority::varyPowerTransmissionByBufferState(double state)
+{	
+	if(state > limiarBuffer)
+	{
+		potenciaAtual = -10;
+		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
+	}
+	else if( (state < limiarBuffer) && (potencia != potenciaAtual))
+	{
+		potenciaAtual = potencia;
+		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
+	}
+}
+
 int ThroughputPriority::handleControlCommand(cMessage * msg){
 
 	ThroghputPriorityMsg *cmd = check_and_cast <ThroghputPriorityMsg*>(msg);
@@ -212,24 +230,17 @@ int ThroughputPriority::handleControlCommand(cMessage * msg){
 	switch (INFO_TYPE) {
 		
 		case TAXAMAC_INFO : {
-			trace() << "TAXAMAC_INFO    " << cmd->getTaxaMAC();
+			trace() << "TAXAMAC_INFO    " << cmd->getTaxaMAC() << "    BUFFER_INFO    " << cmd->getBufferState();
 			break;	
 		}
 		case BUFFER_INFO : {
 			double state = cmd->getBufferState();
-			if(state > 85.0)
+			if(utilizarTaxaBuffer)
 			{
-				potenciaAtual = -10;
-				toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
+				varyPowerTransmissionByBufferState(state);
+				trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual;
 			}
-			else if( (state < 85.0) && (potencia != potenciaAtual))
-			{
-				potenciaAtual = potencia;
-				toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
-			}
-
-			trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual;
-			break;
+			
 		}
 	}
 

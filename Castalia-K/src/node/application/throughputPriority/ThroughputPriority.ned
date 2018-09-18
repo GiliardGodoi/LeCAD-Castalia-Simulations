@@ -12,7 +12,9 @@ simple ThroughputPriority like node.application.iApplication {
 	int constantDataPayload = default (100);	// in bytes
 
 	int taxa = default (80);
-	int potencia = default(-25);
+	int potencia = default (-25);
+	double limiarBuffer = default(85.0);
+	bool utilizarTaxaBuffer = default(false);
 
 	bool isSink = default(false);
 	double delayLimit = default (0); 		// application delay limit (0 - no limit)

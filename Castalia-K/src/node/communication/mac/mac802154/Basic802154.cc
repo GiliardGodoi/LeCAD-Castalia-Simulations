@@ -210,7 +210,7 @@ void Basic802154::timerFiredCallback(int index)
 			if (macState == MAC_STATE_GTS || macState == MAC_STATE_SLEEP) break;
 			CCA_result CCAcode = radioModule->isChannelClear();
 			if (CCAcode == CLEAR) {
-				trace() << "CCA is clear, CW  " << CW;
+				// trace() << "CCA is clear, CW  " << CW;
 				//Channel clear
 				if (--CW > 0) {
 					setTimer(PERFORM_CCA, unitBackoffPeriod * symbolLen);
@@ -314,8 +314,7 @@ void Basic802154::finishSpecific()
 			collectOutput("Packet breakdown", "Failed, no PAN", iter->second);
 			temporario="FailednoPAN ";
 		} else {
-			trace() << "Unknown packet breakdonw category: " <<
-				iter->first << " with " << iter->second << " packets";
+			// trace() << "Unknown packet breakdonw category: " << iter->first << " with " << iter->second << " packets";
 		}
 		// trace()<<temporario<<iter->second;
 	}
@@ -461,7 +460,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 			setTimer(FRAME_START, baseSuperframeDuration * (1 << beaconOrder) *
 				 symbolLen - guardTime - offset);
 			
-			trace() << "Beacon recebido " << " RSSI " << rssi << " LQI " << lqi;
+			// trace() << "Beacon recebido " << " RSSI " << rssi << " LQI " << lqi;
 			break;
 		}
 
@@ -550,7 +549,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 				break;
 
 			// otherwise, generate and send an ACK
-			trace() << "received packet " << rcvPacket->getSeqNum() << " from node " << rcvPacket->getSrcID() << " RSSI " << rssi << " LQI " << lqi;
+			// trace() << "received packet " << rcvPacket->getSeqNum() << " from node " << rcvPacket->getSrcID() << " RSSI " << rssi << " LQI " << lqi;
 			Basic802154Packet *ackPacket = new Basic802154Packet("Ack packet", MAC_LAYER_PACKET);
 			ackPacket->setPANid(SELF_MAC_ADDRESS);
 			ackPacket->setMac802154PacketType(MAC_802154_ACK_PACKET);
@@ -602,13 +601,13 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 		case MAC_802154_DATA_PACKET: {
 			if (currentPacket->getSeqNum() == rcvPacket->getSeqNum()) {
 				if(SELF_MAC_ADDRESS != 0){
-					trace() << "ACK from packet # " << rcvPacket->getSeqNum() << " currentPacket [PktMAC#] " << currentPacket->getSeqNum();
+					// trace() << "ACK from packet # " << rcvPacket->getSeqNum() << " currentPacket [PktMAC#] " << currentPacket->getSeqNum();
 					setAckResult(1); // UM para sucesso e ZERO para falha
 				}
-				trace() << "Data packet successfully transmitted to " << rcvPacket->getSrcID() << ", local clock " << getClock();
+				// trace() << "Data packet successfully transmitted to " << rcvPacket->getSrcID() << ", local clock " << getClock();
 				clearCurrentPacket("Success",true);
 			} else { // atual != recebido
-				trace() << "Received ACK SeqNum# " << rcvPacket->getSeqNum() << " currentPacket [PktMAC#] " << currentPacket->getSeqNum();
+				// trace() << "Received ACK SeqNum# " << rcvPacket->getSeqNum() << " currentPacket [PktMAC#] " << currentPacket->getSeqNum();
 				collectPacketHistory("NoAck");
 				attemptTransmission("Wrong SeqNum in Ack");
 			}
@@ -622,7 +621,7 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 		}
 
 		default:{
-			trace() << "WARNING: received unexpected ACK to packet [" << currentPacket->getName() << "]";
+			// trace() << "WARNING: received unexpected ACK to packet [" << currentPacket->getName() << "]";
 			break;
 		}
 	}
@@ -684,7 +683,7 @@ void Basic802154::attemptTransmission(const char * descr)
 {
 	cancelTimer(ATTEMPT_TX);
 	if (macState == MAC_STATE_SLEEP || macState == MAC_STATE_SETUP) return;
-	trace() << "Attempt transmission, description: " << descr;
+	// trace() << "Attempt transmission, description: " << descr;
 	
 	// if a packet already queued for transmission - check avaliable retries and delay
 	if (currentPacket && (currentPacketRetries == 0 || (currentPacketLimit > 0 && 
@@ -695,10 +694,10 @@ void Basic802154::attemptTransmission(const char * descr)
 	
 	if (currentPacket) {
 		if (macState == MAC_STATE_GTS) {	
-			trace() << "Transmitting [" << currentPacket->getName() << "] in GTS";
+			// trace() << "Transmitting [" << currentPacket->getName() << "] in GTS";
 			transmitCurrentPacket();			
 		} else if (macState == MAC_STATE_CAP && currentPacketGtsOnly == false) {
-			trace() << "Attempt transmitting [" << currentPacket->getName() << "] in CAP, starting CSMA_CA PktMAC# " << currentPacket->getSeqNum() ;
+			// trace() << "Attempt transmitting [" << currentPacket->getName() << "] in CAP, starting CSMA_CA PktMAC# " << currentPacket->getSeqNum() ;
 			NB = 0;
 			CW = enableSlottedCSMA ? 2 : 1;
 			BE = batteryLifeExtention ? (macMinBE < 2 ? macMinBE : 2) : macMinBE;
@@ -920,10 +919,13 @@ void Basic802154::handleTaxaMac(float taxaMAC){
 
 	trace() << "Janela taxaMAC  " << taxaMAC;
 	// sendCommand(taxaMAC);
+	float bufferState = (float)TXBuffer.size()/macBufferSize * 100;
 
 	ThroghputPriorityMsg *cmd = new ThroghputPriorityMsg("ThroughputPriorityCommand", APPLICATION_CONTROL_COMMAND);
 	cmd->setType(TAXAMAC_INFO);
+	
 	cmd->setTaxaMAC(taxaMAC);
+	cmd->setBufferState(bufferState);
 	
 	toNetworkLayer(cmd);
 }
@@ -957,7 +959,7 @@ int Basic802154::bufferPacket(cPacket * rcvFrame)
 		TXBuffer.push(rcvFrame);
 		trace() << "Packet buffered from network layer, buffer state: "
 		    << TXBuffer.size() << "/" << macBufferSize;
-
+		
 		handleBufferMeasurement(TXBuffer.size());
 		return 1;
 	}

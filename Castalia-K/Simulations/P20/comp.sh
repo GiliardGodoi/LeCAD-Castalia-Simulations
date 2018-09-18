@@ -3,21 +3,22 @@
 rm *.txt
 rm *.csv
 
-echo "Executando simulação\n"
+echo "Executando simulação P 20\n"
 # Castalia -c General -r 3 -o saida.txt
 # Castalia -c BaselineMAC,General,setRate,setPower,varyInterferenceModel,setPotencia1 -r 3 -o saida.txt
 # CastaliaResults -i saida.txt -s packet -n
 # CastaliaResults -i saida.txt -s received -n -o 2 > temp.txt
 
-Castalia -c General,ZigBeeMAC,setRate,setInterferenceModel,traceFromMac -r 100 -o saida.txt
-#Castalia -c General,ZigBeeMAC,setRate,varyInterferenceModel,traceFromApp,traceFromMac -r 1 -o saida.txt
+Castalia -c General,ZigBeeMAC,TxPotenciaVinte,packetRate5,comTaxaBuffer,modeloColisaoUm,traceFromApp -r 1 -o saida.txt
+
 
 echo "EXECUTANDO awk\n"
 # awk -f janelaMAC.awk Castalia-Trace.txt > dataTaxaMacFromMacLayer.csv
 # awk -f taxamac.awk Castalia-Trace.txt > dataTaxaMacFromAppLayer.csv
 
-awk -f ../../awks/buffer.awk Castalia-Trace.txt > bufferData.csv
-awk -f ../../awks/janelaMAC.awk Castalia-Trace.txt > taxaMACData.csv
+awk -f ../../awks/bufferInfo.awk Castalia-Trace.txt > bufferData.csv
+awk -f ../../awks/APPtaxaMAC.awk Castalia-Trace.txt > taxaMACData.csv
+awk -f ../../awks/filtro.awk Castalia-Trace.txt > nodefive.txt
 
 # echo "CAPTURANDO DADOS CastaliaResults\n"
 

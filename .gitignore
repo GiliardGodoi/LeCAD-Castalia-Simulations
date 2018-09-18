@@ -16,6 +16,9 @@ saida.txt
 # ignorando arquivo de dados
 *.csv
 
+# ignorando arquivos python
+__pycache__
+
 # ignorando as outras simulações padrão
 AODVTest
 BANtest

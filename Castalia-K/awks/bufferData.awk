@@ -10,7 +10,7 @@ BEGIN{
     iteration = 1
     previous = 0
 
-    print "Tempo|Nó Sensor|Taxa Buffer|Potencia|Repetição"
+    print "Tempo|Nó sensor|Taxa Buffer|Potencia|Repetição"
 }
 {
     if($3 == "BUFFER_INFO"){

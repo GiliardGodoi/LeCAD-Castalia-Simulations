@@ -7,11 +7,13 @@ def read(arquivo='bufferData.csv'):
     return df
 
 def serieTemporal(dfData,output='taxaBufferVsTempo.png'):
-    # axes = dfData.plot(x="Tempo",y="Taxa Buffer",hue="Nó Sensor",style="--",marker=".",figsize=(40,10))
-    axes = plt.figure(figsize=(40,5))
-    axes = sns.lineplot(x="Tempo",y="Taxa Buffer",hue="Nó Sensor",data=dfData)
-    fig = axes.get_figure()
-    fig.savefig(output)
+    
+    df = dfData[['Tempo','Nó Sensor', 'Taxa Buffer']]
+    df = df.pivot(index='Tempo',columns='Nó Sensor',values='Taxa Buffer')
+    df.fillna(value=0,inplace=True)
+    axes = df.plot(subplots=True, figsize=(25, 10),legend=True,ylim=(0,75),style='-')
+    plt.tight_layout()
+    plt.savefig(output)
     return axes
 
 def distribuicao(dfData,output='distribuicao-taxabuffer.png'):
@@ -26,4 +28,4 @@ def distribuicao(dfData,output='distribuicao-taxabuffer.png'):
 if __name__ == "__main__":
     df = read()
     serieTemporal(df)
-    # distribuicao(df)
+    distribuicao(df)

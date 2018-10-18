@@ -661,7 +661,7 @@ void Basic802154::clearCurrentPacket(const char * s, bool success) {
 void Basic802154::transmitPacket(Basic802154Packet *pkt, int retries, bool state, double limit) {
 	clearCurrentPacket();
 
-//	trace() << "transmitPacket([" << pkt->getName() << "]," << retries << "," << state << "," << limit << ")";
+	trace() << "transmitPacket([" << pkt->getName() << "]," << retries << "," << state << "," << limit << ")";
 	currentPacket = pkt;
 	currentPacketGtsOnly = state;
 	currentPacketHistory = "";
@@ -683,7 +683,7 @@ void Basic802154::attemptTransmission(const char * descr)
 {
 	cancelTimer(ATTEMPT_TX);
 	if (macState == MAC_STATE_SLEEP || macState == MAC_STATE_SETUP) return;
-	// trace() << "Attempt transmission, description: " << descr;
+	trace() << "Attempt transmission, description: " << descr;
 	
 	// if a packet already queued for transmission - check avaliable retries and delay
 	if (currentPacket && (currentPacketRetries == 0 || (currentPacketLimit > 0 && 
@@ -844,11 +844,10 @@ int Basic802154::handleControlCommand(cMessage * msg){
 	Basic802154ControlCommand *cmd = check_and_cast <Basic802154ControlCommand*>(msg);
 	parameterMsg = cmd->getParameter();
 	kindMsg = cmd->getBasic802154CommandKind();
-	trace() << "Chegou prioridade "<<kindMsg;
+
 	if(kindMsg == 1){
 		macMaxFrameRetries = (int)parameterMsg;
-		//macMaxFrameRetries = (int)1;
-		//trace() << "Tentativas "<<macMaxFrameRetries;
+		trace() << "NRO_TENTATIVAS    "<< macMaxFrameRetries << "    TIPO_MSG    " << kindMsg;
 	}
 	delete cmd;
 	return 1;

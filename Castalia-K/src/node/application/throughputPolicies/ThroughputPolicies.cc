@@ -8,7 +8,7 @@ Define_Module(ThroughputPolicies);
 random_device ThroughputPolicies::rd;
 mt19937 ThroughputPolicies::gen(ThroughputPolicies::rd());
 //uniform_int_distribution<> ThroughputPolicies::dis(0,4);
-binomial_distribution<> ThroughputPolicies::dis(4, 0.9);
+binomial_distribution<> ThroughputPolicies::dis(4, 0.7);
 
 void ThroughputPolicies::startup()
 {
@@ -105,18 +105,17 @@ void ThroughputPolicies::timerFiredCallback(int index)
 	int valuePriority;
 	switch (index) {
 		case SEND_PACKET:{
-		
 			toNetworkLayer(createGenericDataPacket(0, dataSN), recipientAddress.c_str());
-//atoi(SELF_NETWORK_ADDRESS)
 			valuePriority = getPriority();
-			if (valuePriority>0){
+			if (valuePriority > 0){
 				Basic802154ControlCommand *cmd = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
 				
 				cmd->setBasic802154CommandKind (SET_INTERVAL); // envio para camada MAC
 				cmd->setParameter(valuePriority);
-//				trace() << "APP prioridade MAC interval = " << SET_INTERVAL << " tentativas "<<valuePriority;
+				trace() << "APP prioridade MAC interval = " << SET_INTERVAL << " tentativas "<<valuePriority;
 				toNetworkLayer(cmd);
 			}
+
 			packetsSent[recipientId]++;
 			dataSN++;
 			setTimer(SEND_PACKET, packet_spacing);
@@ -172,18 +171,55 @@ void ThroughputPolicies::finishSpecific() {
 	}
 }
 
+void ThroughputPolicies::varyTriesByBufferState(double state)
+{	
+	Basic802154ControlCommand *cmdPrioridade = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
+	cmdPrioridade->setBasic802154CommandKind(SET_INTERVAL); // envio para camada
+
+	if(state > limiarBuffer)
+	{
+		cmdPrioridade->setParameter(1);
+	}
+	else
+	{
+		cmdPrioridade->setParameter(2);
+	}
+	
+	toNetworkLayer(cmdPrioridade);
+}
+
 int ThroughputPolicies::handleControlCommand(cMessage * msg){
 
-	ThroughputTestControlCommand *cmd = check_and_cast <ThroughputTestControlCommand*>(msg);
-	double taxaMAC = cmd->getParameter();
+	
 	int nroRandomico = dis(gen);
 	int potencia = vetorPotencia[nroRandomico];
-
-	toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 	
-	trace() << "TAXAMAC    " << taxaMAC;
+	
 	trace() << "RANDOMICO    " << nroRandomico << "    POTENCIA    " << potencia;
 
+	ThroghputPriorityMsg *cmd = check_and_cast <ThroghputPriorityMsg*>(msg);
+	int INFO_TYPE = cmd->getType();
+
+	switch (INFO_TYPE) {
+		
+		case TAXAMAC_INFO : {
+			trace() << "TAXAMAC_INFO    " << cmd->getTaxaMAC() << "    BUFFER_INFO    " << cmd->getBufferState();
+			break;	
+		}
+		case BUFFER_INFO : {
+			double state = cmd->getBufferState();
+			if(utilizarTaxaBuffer)
+			{
+				varyTriesByBufferState(state);
+			}
+			trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual << "    IS_TAXA_BUFFER    " << utilizarTaxaBuffer;
+			
+		}
+	}
+
+	potenciaAtual = potencia;
+	toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
+
 	delete cmd;
-	return 1;
+	return 2;
 }

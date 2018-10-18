@@ -74,15 +74,15 @@ void ThroughputPriority::timerFiredCallback(int index)
 	
 			toNetworkLayer(createGenericDataPacket(0, dataSN), recipientAddress.c_str());
 //atoi(SELF_NETWORK_ADDRESS)
-			valuePriority = getPriority();
-			if (valuePriority>0){
-				Basic802154ControlCommand *cmd = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
+// 			valuePriority = getPriority(); // Retorna sempre o valor 2
+// 			if (valuePriority>0){
+// 				Basic802154ControlCommand *cmd = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
 				
-				cmd->setBasic802154CommandKind (SET_INTERVAL); // envio para camada MAC
-				cmd->setParameter(valuePriority);
-//				trace() << "APP prioridade MAC interval = " << SET_INTERVAL << " tentativas "<<valuePriority;
-				toNetworkLayer(cmd);
-			}
+// 				cmd->setBasic802154CommandKind (SET_INTERVAL); // envio para camada MAC
+// 				cmd->setParameter(valuePriority);
+// //				trace() << "APP prioridade MAC interval = " << SET_INTERVAL << " tentativas "<<valuePriority;
+// 				toNetworkLayer(cmd);
+// 			}
 			packetsSent[recipientId]++;
 			dataSN++;
 //			if (dataSN%10==0)
@@ -209,16 +209,19 @@ void ThroughputPriority::countTransmitions(){
 
 void ThroughputPriority::varyPowerTransmissionByBufferState(double state)
 {	
+	Basic802154ControlCommand *cmdPrioridade = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
+	cmdPrioridade->setBasic802154CommandKind(SET_INTERVAL); // envio para camada
+
 	if(state > limiarBuffer)
 	{
-		potenciaAtual = -10;
-		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
+		cmdPrioridade->setParameter(1);
 	}
-	else if( (state < limiarBuffer) && (potencia != potenciaAtual))
+	else
 	{
-		potenciaAtual = potencia;
-		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potenciaAtual));
+		cmdPrioridade->setParameter(2);
 	}
+	
+	toNetworkLayer(cmdPrioridade);
 }
 
 int ThroughputPriority::handleControlCommand(cMessage * msg){
@@ -238,8 +241,8 @@ int ThroughputPriority::handleControlCommand(cMessage * msg){
 			if(utilizarTaxaBuffer)
 			{
 				varyPowerTransmissionByBufferState(state);
-				trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual;
 			}
+			trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual << "    IS_TAXA_BUFFER    " << utilizarTaxaBuffer;
 			
 		}
 	}

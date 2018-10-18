@@ -3,6 +3,7 @@
 
 #include "VirtualApplication.h"
 #include "ThroughputTestControl_m.h"
+#include "ThroughputPriorityMsg_m.h"
 #include <map>
 #include <random>
 
@@ -40,6 +41,9 @@ class ThroughputPolicies: public VirtualApplication {
     static mt19937 gen;
     //static uniform_int_distribution<> dis;
 	static binomial_distribution<> dis;
+	int potenciaAtual = 0;
+	double limiarBuffer = 85.0;
+	bool utilizarTaxaBuffer = false;
 
  protected:
 	void startup();
@@ -48,6 +52,7 @@ class ThroughputPolicies: public VirtualApplication {
 	void timerFiredCallback(int);
 	void finishSpecific();
 	int getPriority();
+	void varyTriesByBufferState(double);
 	int handleControlCommand(cMessage * msg);
 
  public:

@@ -12,9 +12,7 @@ simple ThroughputPolicies like node.application.iApplication {
 	int constantDataPayload = default (100);	// in bytes
 
 	int taxa = default (80);
-	double limiarBuffer = default(85.0);
-	bool utilizarTaxaBuffer = default(false);
-
+	
 	double CCAthreshold = default (-95.0);   
 	double CCAthreshold2 = default (-95.0);
 

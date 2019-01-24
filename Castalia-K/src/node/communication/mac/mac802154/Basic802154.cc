@@ -460,7 +460,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 			setTimer(FRAME_START, baseSuperframeDuration * (1 << beaconOrder) *
 				 symbolLen - guardTime - offset);
 			
-			// trace() << "Beacon recebido " << " RSSI " << rssi << " LQI " << lqi;
+			trace() << " RSSI " << rssi << " LQI " << lqi;
 			break;
 		}
 
@@ -574,7 +574,7 @@ void Basic802154::fromRadioLayer(cPacket * pkt, double rssi, double lqi)
 void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, double lqi)
 {
 	if (currentPacket == NULL) {
-		trace() << "WARNING received ACK packet while currentPacket == NULL";
+		// trace() << "WARNING received ACK packet while currentPacket == NULL";
 		return;
 	}
 		
@@ -590,7 +590,7 @@ void Basic802154::handleAckPacket(Basic802154Packet * rcvPacket, double rssi, do
 				desyncTimeStart = -1;
 			}
 			// Pacote 0 é recebido como associado a PAN
-			trace() << "ACK Associated with PAN:" << associatedPAN;
+			// trace() << "ACK Associated with PAN:" << associatedPAN;
 			setMacState(MAC_STATE_CAP);
 			clearCurrentPacket("Success",true);
 			connectedToPAN_node();
@@ -661,7 +661,7 @@ void Basic802154::clearCurrentPacket(const char * s, bool success) {
 void Basic802154::transmitPacket(Basic802154Packet *pkt, int retries, bool state, double limit) {
 	clearCurrentPacket();
 
-	trace() << "transmitPacket([" << pkt->getName() << "]," << retries << "," << state << "," << limit << ")";
+	// trace() << "transmitPacket([" << pkt->getName() << "]," << retries << "," << state << "," << limit << ")";
 	currentPacket = pkt;
 	currentPacketGtsOnly = state;
 	currentPacketHistory = "";
@@ -683,7 +683,7 @@ void Basic802154::attemptTransmission(const char * descr)
 {
 	cancelTimer(ATTEMPT_TX);
 	if (macState == MAC_STATE_SLEEP || macState == MAC_STATE_SETUP) return;
-	trace() << "Attempt transmission, description: " << descr;
+	// trace() << "Attempt transmission, description: " << descr;
 	
 	// if a packet already queued for transmission - check avaliable retries and delay
 	if (currentPacket && (currentPacketRetries == 0 || (currentPacketLimit > 0 && 
@@ -726,9 +726,9 @@ void Basic802154::performCSMACA()
 
 	
 	if(currentPacket){
-		trace() << "CSMA/CA random backoff value: " << rnd << ", in " << CCAtime << " seconds PktMAC# " << currentPacket->getSeqNum();
+		// trace() << "CSMA/CA random backoff value: " << rnd << ", in " << CCAtime << " seconds PktMAC# " << currentPacket->getSeqNum();
 	}else{
-		trace() << "CSMA/CA random backoff value: " << rnd << ", in " << CCAtime << " seconds";
+		// trace() << "CSMA/CA random backoff value: " << rnd << ", in " << CCAtime << " seconds";
 	}
 
 	//set a timer to perform carrier sense after calculated time
@@ -775,12 +775,12 @@ void Basic802154::transmitCurrentPacket()
 		}
 		//decrement retry counter, set transmission end timer and modify mac and radio states.
 		currentPacketRetries--;
-		trace() << "Transmitting [" << currentPacket->getName() <<" PktMAC# " << currentPacket->getSeqNum() <<" ] now, remaining attempts " << currentPacketRetries;
+		// trace() << "Transmitting [" << currentPacket->getName() <<" PktMAC# " << currentPacket->getSeqNum() <<" ] now, remaining attempts " << currentPacketRetries;
 		setTimer(currentPacketResponse > 0 ? ACK_TIMEOUT : ATTEMPT_TX, txTime);
 		toRadioLayer(currentPacket->dup());
 		toRadioLayer(createRadioCommand(SET_STATE, TX));
 
-		trace() << "PacketCount " << getPacketCount();
+		// trace() << "PacketCount " << getPacketCount();
 	} else {
 		//transmission not allowed
 //		trace() << "txTime " << txTime << " CAP:" << (currentFrameStart + CAPend - getClock()) << 
@@ -847,7 +847,7 @@ int Basic802154::handleControlCommand(cMessage * msg){
 
 	if(kindMsg == 1){
 		macMaxFrameRetries = (int)parameterMsg;
-		trace() << "NRO_TENTATIVAS    "<< macMaxFrameRetries << "    TIPO_MSG    " << kindMsg;
+		// trace() << "NRO_TENTATIVAS    "<< macMaxFrameRetries << "    TIPO_MSG    " << kindMsg;
 	}
 	delete cmd;
 	return 1;
@@ -877,7 +877,7 @@ void Basic802154::setAckResult(int ack){
 	int tmp = ackCount;
 	ackCount = ackCount + ack;
 
-	trace() << "AckCount " << ackCount << " = " << tmp << " + " << ack;
+	// trace() << "AckCount " << ackCount << " = " << tmp << " + " << ack;
 }
 
 int Basic802154::getAckCount(){
@@ -931,7 +931,7 @@ void Basic802154::handleTaxaMac(float taxaMAC){
 
 void Basic802154::handleBufferMeasurement(int buffer){
 
-	trace() << "CurrentBufferState    " << buffer;
+	// trace() << "CurrentBufferState    " << buffer;
 
 	float bufferState = (float)buffer/ macBufferSize * 100;
 
@@ -956,8 +956,8 @@ int Basic802154::bufferPacket(cPacket * rcvFrame)
 		return 0;
 	} else {
 		TXBuffer.push(rcvFrame);
-		trace() << "Packet buffered from network layer, buffer state: "
-		    << TXBuffer.size() << "/" << macBufferSize;
+		// trace() << "Packet buffered from network layer, buffer state: "
+		// 		   << TXBuffer.size() << "/" << macBufferSize;
 		
 		handleBufferMeasurement(TXBuffer.size());
 		return 1;

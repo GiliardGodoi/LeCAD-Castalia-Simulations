@@ -7,8 +7,8 @@ Define_Module(ThroughputPolicies);
 
 random_device ThroughputPolicies::rd;
 mt19937 ThroughputPolicies::gen(ThroughputPolicies::rd());
-//uniform_int_distribution<> ThroughputPolicies::dis(0,4);
-binomial_distribution<> ThroughputPolicies::dis(4, 0.7);
+uniform_int_distribution<> ThroughputPolicies::dis(0,4);
+// binomial_distribution<> ThroughputPolicies::dis(4, 0.7);
 
 void ThroughputPolicies::startup()
 {
@@ -55,7 +55,7 @@ void ThroughputPolicies::fromNetworkLayer(ApplicationPacket * rcvPacket,
 	// This node is the final recipient for the packet
 	if (recipientAddress.compare(SELF_NETWORK_ADDRESS) == 0) {
 		if (delayLimit == 0 || (simTime() - rcvPacket->getCreationTime()) <= delayLimit) {
-//			trace() << "Received packet #" << sequenceNumber << " from node " << source;
+			trace() << "RECEIVED_PACKET_#  " << sequenceNumber << "   FROM   " << source << "    RSSI   " << rssi;
 			collectOutput("Packets received per node", sourceId);
 			packetsReceived[sourceId]++;
 			bytesReceived[sourceId] += rcvPacket->getByteLength();
@@ -74,29 +74,31 @@ void ThroughputPolicies::fromNetworkLayer(ApplicationPacket * rcvPacket,
 }
 
 int ThroughputPolicies::getPriority(){
-	int r;
-//	trace() << "Priority = " << priority;
-	if(priority){
-		r = rand()%100+1;
-//		trace() << "VALORDER = " << r;
-		if(r>40){
-//			trace() << "PRIORIDADE4"; 
-			return 4;
-		}
-		else if(r>30){
-//			trace() << "PRIORIDADE3";
-			return 3;
-		}		
-		else if(r>=20){
-//			trace() << "PRIORIDADE2"; 
-			return 2;		
-		}
-		else{
-//			trace() << "PRIORIDADE0"; 
-			return 0;
-		}
-	}
-//	trace() << "PRIORIDADENULA"; 
+// 	int r;
+// //	trace() << "Priority = " << priority;
+// 	if(priority){
+// 		r = rand()%100+1;
+// //		trace() << "VALORDER = " << r;
+// 		if(r>40){
+// //			trace() << "PRIORIDADE4"; 
+// 			return 4;
+// 		}
+// 		else if(r>30){
+// //			trace() << "PRIORIDADE3";
+// 			return 3;
+// 		}		
+// 		else if(r>=20){
+// //			trace() << "PRIORIDADE2"; 
+// 			return 2;		
+// 		}
+// 		else{
+// //			trace() << "PRIORIDADE0"; 
+// 			return 0;
+// 		}
+// 	}
+// //	trace() << "PRIORIDADENULA"; 
+// 	return -1;
+
 	return -1;
 }
 
@@ -106,15 +108,15 @@ void ThroughputPolicies::timerFiredCallback(int index)
 	switch (index) {
 		case SEND_PACKET:{
 			toNetworkLayer(createGenericDataPacket(0, dataSN), recipientAddress.c_str());
-			valuePriority = getPriority();
-			if (valuePriority > 0){
-				Basic802154ControlCommand *cmd = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
+			// valuePriority = getPriority();
+			// if (valuePriority > 0){
+			// 	Basic802154ControlCommand *cmd = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
 				
-				cmd->setBasic802154CommandKind (SET_INTERVAL); // envio para camada MAC
-				cmd->setParameter(valuePriority);
-				trace() << "APP prioridade MAC interval = " << SET_INTERVAL << " tentativas "<<valuePriority;
-				toNetworkLayer(cmd);
-			}
+			// 	cmd->setBasic802154CommandKind (SET_INTERVAL); // envio para camada MAC
+			// 	cmd->setParameter(valuePriority);
+			// 	trace() << "APP prioridade MAC interval = " << SET_INTERVAL << " tentativas "<<valuePriority;
+			// 	toNetworkLayer(cmd);
+			// }
 
 			packetsSent[recipientId]++;
 			dataSN++;
@@ -171,23 +173,6 @@ void ThroughputPolicies::finishSpecific() {
 	}
 }
 
-void ThroughputPolicies::varyTriesByBufferState(double state)
-{	
-	Basic802154ControlCommand *cmdPrioridade = new Basic802154ControlCommand("Basic802154 control command", MAC_CONTROL_COMMAND);
-	cmdPrioridade->setBasic802154CommandKind(SET_INTERVAL); // envio para camada
-
-	if(state > limiarBuffer)
-	{
-		cmdPrioridade->setParameter(1);
-	}
-	else
-	{
-		cmdPrioridade->setParameter(2);
-	}
-	
-	toNetworkLayer(cmdPrioridade);
-}
-
 int ThroughputPolicies::handleControlCommand(cMessage * msg){
 
 	
@@ -195,7 +180,7 @@ int ThroughputPolicies::handleControlCommand(cMessage * msg){
 	int potencia = vetorPotencia[nroRandomico];
 	
 	
-	trace() << "RANDOMICO    " << nroRandomico << "    POTENCIA    " << potencia;
+	
 
 	ThroghputPriorityMsg *cmd = check_and_cast <ThroghputPriorityMsg*>(msg);
 	int INFO_TYPE = cmd->getType();
@@ -203,22 +188,20 @@ int ThroughputPolicies::handleControlCommand(cMessage * msg){
 	switch (INFO_TYPE) {
 		
 		case TAXAMAC_INFO : {
+			trace() << "RANDOMICO    " << nroRandomico << "    POTENCIA    " << potencia;
 			trace() << "TAXAMAC_INFO    " << cmd->getTaxaMAC() << "    BUFFER_INFO    " << cmd->getBufferState();
+
+			potenciaAtual = potencia;
+			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));	
 			break;	
 		}
 		case BUFFER_INFO : {
 			double state = cmd->getBufferState();
-			if(utilizarTaxaBuffer)
-			{
-				varyTriesByBufferState(state);
-			}
-			trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual << "    IS_TAXA_BUFFER    " << utilizarTaxaBuffer;
+
+			trace() << "BUFFER_INFO    " << state ;
 			
 		}
 	}
-
-	potenciaAtual = potencia;
-	toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 
 	delete cmd;
 	return 2;

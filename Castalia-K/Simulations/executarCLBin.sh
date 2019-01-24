@@ -21,38 +21,38 @@ listar_dados()
 
 repeticao=30
 
-echo "SIMULAÇÃO CL Binomial Sem Tentativa Sem Buffer"
-mkdir CLBinSemTentativaSemBuffer
-cp omnetpp.ini  CLBinSemTentativaSemBuffer/
-cd CLBinSemTentativaSemBuffer/
-rm *txt
-rm *csv
-Castalia -c General,ZigBeeMAC,AppCLBin,varyInterferenceModel,semMudancaTentativa,semTaxaBuffer,traceFromApp,packetRatePozza2015,TxPotenciaDez -r $repeticao  -o saida.txt
-listar_dados
-executar_awk
-cd ..
-echo "...fim simulação"
+# echo "SIMULAÇÃO CL Binomial Sem Tentativa Sem Buffer"
+# mkdir CLBinSemTentativaSemBuffer
+# cp omnetpp.ini  CLBinSemTentativaSemBuffer/
+# cd CLBinSemTentativaSemBuffer/
+# rm *txt
+# rm *csv
+# Castalia -c General,ZigBeeMAC,AppCLBin,varyInterferenceModel,semMudancaTentativa,semTaxaBuffer,traceFromApp,packetRatePozza2015,TxPotenciaDez -r $repeticao  -o saida.txt
+# listar_dados
+# executar_awk
+# cd ..
+# echo "...fim simulação"
 
-echo "SIMULAÇÃO CL Binomial Com Tentativa Sem Buffer"
-mkdir CLBinComTentativaSemBuffer
-cp omnetpp.ini  CLBinComTentativaSemBuffer/
-cd CLBinComTentativaSemBuffer/
-rm *txt
-rm *csv
-Castalia -c General,ZigBeeMAC,AppCLBin,varyInterferenceModel,comMudancaTentativa,semTaxaBuffer,traceFromApp,packetRatePozza2015,TxPotenciaDez -r $repeticao  -o saida.txt
-listar_dados
-executar_awk
-cd ..
-echo "...fim simulação"
+# echo "SIMULAÇÃO CL Binomial Com Tentativa Sem Buffer"
+# mkdir CLBinComTentativaSemBuffer
+# cp omnetpp.ini  CLBinComTentativaSemBuffer/
+# cd CLBinComTentativaSemBuffer/
+# rm *txt
+# rm *csv
+# Castalia -c General,ZigBeeMAC,AppCLBin,varyInterferenceModel,comMudancaTentativa,semTaxaBuffer,traceFromApp,packetRatePozza2015,TxPotenciaDez -r $repeticao  -o saida.txt
+# listar_dados
+# executar_awk
+# cd ..
+# echo "...fim simulação"
 
 
 echo "SIMULAÇÃO CL Binomial Com Tentativa Com Buffer"
-mkdir CLBinComTentativaComBuffer
-cp omnetpp.ini  CLBinComTentativaComBuffer/
-cd CLBinComTentativaComBuffer/
+mkdir CLBinomial
+cp omnetpp.ini  CLBinomial/
+cd CLBinomial/
 rm *txt
 rm *csv
-Castalia -c General,ZigBeeMAC,AppCLBin,varyInterferenceModel,comMudancaTentativa,comTaxaBuffer,traceFromApp,packetRatePozza2015,TxPotenciaDez -r $repeticao  -o saida.txt
+Castalia -c General,ZigBeeMAC,AppPolicies,varyInterferenceModel,traceFromApp,traceFromMac,packetRatePozza2015,TxPotenciaDez -r 35  -o saida.txt
 listar_dados
 executar_awk
 cd ..

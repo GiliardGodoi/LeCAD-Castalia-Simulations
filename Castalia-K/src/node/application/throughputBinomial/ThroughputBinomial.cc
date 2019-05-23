@@ -1,16 +1,15 @@
-#include "ThroughputPolicies.h"
+#include "ThroughputBinomial.h"
 //#include "cstdlib"
 //#include "time.h"
 #include "Basic802154Control_m.h"
 
-Define_Module(ThroughputPolicies);
+Define_Module(ThroughputBinomial);
 
-random_device ThroughputPolicies::rd;
-mt19937 ThroughputPolicies::gen(ThroughputPolicies::rd());
-// uniform_int_distribution<> ThroughputPolicies::dis(0,4);
-binomial_distribution<> ThroughputPolicies::dis(4, 0.7);
+random_device ThroughputBinomial::rd;
+mt19937 ThroughputBinomial::gen(ThroughputBinomial::rd());
+binomial_distribution<> ThroughputBinomial::dis(4, 0.7);
 
-void ThroughputPolicies::startup()
+void ThroughputBinomial::startup()
 {
 	vetorPotencia[0] = -25;
 	vetorPotencia[1] = -20;
@@ -47,7 +46,7 @@ void ThroughputPolicies::startup()
 	declareOutput("Packets received per node");
 }
 
-void ThroughputPolicies::fromNetworkLayer(ApplicationPacket * rcvPacket,
+void ThroughputBinomial::fromNetworkLayer(ApplicationPacket * rcvPacket,
 		const char *source, double rssi, double lqi)
 {
 	int sequenceNumber = rcvPacket->getSequenceNumber();
@@ -73,7 +72,7 @@ void ThroughputPolicies::fromNetworkLayer(ApplicationPacket * rcvPacket,
 	}
 }
 
-int ThroughputPolicies::getPriority(){
+int ThroughputBinomial::getPriority(){
 // 	int r;
 // //	trace() << "Priority = " << priority;
 // 	if(priority){
@@ -102,7 +101,7 @@ int ThroughputPolicies::getPriority(){
 	return -1;
 }
 
-void ThroughputPolicies::timerFiredCallback(int index)
+void ThroughputBinomial::timerFiredCallback(int index)
 {
 	int valuePriority;
 	switch (index) {
@@ -128,7 +127,7 @@ void ThroughputPolicies::timerFiredCallback(int index)
 
 // This method processes a received carrier sense interupt. Used only for demo purposes
 // in some simulations. Feel free to comment out the trace command.
-void ThroughputPolicies::handleRadioControlMessage(RadioControlMessage *radioMsg)
+void ThroughputBinomial::handleRadioControlMessage(RadioControlMessage *radioMsg)
 {
 	switch (radioMsg->getRadioControlMessageKind()) {
 		case CARRIER_SENSE_INTERRUPT:
@@ -137,7 +136,7 @@ void ThroughputPolicies::handleRadioControlMessage(RadioControlMessage *radioMsg
 	}
 }
 
-void ThroughputPolicies::finishSpecific() {
+void ThroughputBinomial::finishSpecific() {
 	declareOutput("Packets sent");
 	declareOutput("Packets reception rate");
 	declareOutput("Packets loss rate");
@@ -148,7 +147,7 @@ void ThroughputPolicies::finishSpecific() {
 
 	long bytesDelivered = 0;
 	for (int i = 0; i < numNodes; i++) {
-		ThroughputPolicies *appModule = dynamic_cast<ThroughputPolicies*>
+		ThroughputBinomial *appModule = dynamic_cast<ThroughputBinomial*>
 			(topo->getNode(i)->getModule()->getSubmodule("Application"));
 		if (appModule) {
 			int packetsSent = appModule->getPacketsSent(self);			
@@ -173,7 +172,7 @@ void ThroughputPolicies::finishSpecific() {
 	}
 }
 
-int ThroughputPolicies::handleControlCommand(cMessage * msg){
+int ThroughputBinomial::handleControlCommand(cMessage * msg){
 
 	
 	int nroRandomico = dis(gen);
@@ -182,7 +181,7 @@ int ThroughputPolicies::handleControlCommand(cMessage * msg){
 	
 	
 
-	ThroghputPriorityMsg *cmd = check_and_cast <ThroghputPriorityMsg*>(msg);
+	CrossLayerMsg *cmd = check_and_cast <CrossLayerMsg*>(msg);
 	int INFO_TYPE = cmd->getType();
 
 	switch (INFO_TYPE) {

@@ -1,7 +1,6 @@
 #include "Basic802154.h"
 
-#include "ThroughputTestControl_m.h"
-#include "ThroughputPriorityMsg_m.h"
+#include "CrossLayerMsg_m.h"
 
 // This module is virtual and can not be used directly
 Define_Module(Basic802154);
@@ -376,11 +375,11 @@ Basic802154Packet *Basic802154::newGtsRequest(int PANid, int slots) {
 }
 
 void Basic802154::sendCommand(double taxaMAC){
-	ThroughputTestControlCommand *cmd = new ThroughputTestControlCommand("ThroughputTest control command", APPLICATION_CONTROL_COMMAND);
-	cmd->setThroughputTestCommandKind (SET_RATE);
-	cmd->setParameter(taxaMAC);
+	// ThroughputTestControlCommand *cmd = new ThroughputTestControlCommand("ThroughputTest control command", APPLICATION_CONTROL_COMMAND);
+	// cmd->setThroughputTestCommandKind (SET_RATE);
+	// cmd->setParameter(taxaMAC);
 
-	toNetworkLayer(cmd);
+	// toNetworkLayer(cmd);
 }
 
 
@@ -917,10 +916,10 @@ bool Basic802154::isWindowReached(){
 void Basic802154::handleTaxaMac(float taxaMAC){
 
 	trace() << "Janela taxaMAC  " << taxaMAC;
-	// sendCommand(taxaMAC);
+
 	float bufferState = (float)TXBuffer.size()/macBufferSize * 100;
 
-	ThroghputPriorityMsg *cmd = new ThroghputPriorityMsg("ThroughputPriorityCommand", APPLICATION_CONTROL_COMMAND);
+	CrossLayerMsg *cmd = new CrossLayerMsg("CrossLayerMsg", APPLICATION_CONTROL_COMMAND);
 	cmd->setType(TAXAMAC_INFO);
 	
 	cmd->setTaxaMAC(taxaMAC);
@@ -935,7 +934,7 @@ void Basic802154::handleBufferMeasurement(int buffer){
 
 	float bufferState = (float)buffer/ macBufferSize * 100;
 
-	ThroghputPriorityMsg *cmd = new ThroghputPriorityMsg("ThroughputPriorityCommand", APPLICATION_CONTROL_COMMAND);
+	CrossLayerMsg *cmd = new CrossLayerMsg("CrossLayerMsg", APPLICATION_CONTROL_COMMAND);
 	cmd->setType(BUFFER_INFO);
 	cmd->setBufferState(bufferState);
 	

@@ -2,18 +2,17 @@
 #define _THROUGHPUTTEST_H_
 
 #include "VirtualApplication.h"
-#include "ThroughputTestControl_m.h"
-#include "ThroughputPriorityMsg_m.h"
+#include "CrossLayerMsg_m.h"
 #include <map>
 #include <random>
 
 using namespace std;
 
-enum ThroughputPoliciesTimers {
+enum ThroughputUniformeTimers {
 	SEND_PACKET = 1
 };
 
-class ThroughputPolicies: public VirtualApplication {
+class ThroughputUniforme: public VirtualApplication {
  private:
 	double packet_rate;
 	double startupDelay;
@@ -39,8 +38,7 @@ class ThroughputPolicies: public VirtualApplication {
 	// RANDOM STUFF
 	static random_device rd;
     static mt19937 gen;
-    // static uniform_int_distribution<> dis;
-	static binomial_distribution<> dis;
+    static uniform_int_distribution<> dis;
 	int potenciaAtual = 0;
 
  protected:

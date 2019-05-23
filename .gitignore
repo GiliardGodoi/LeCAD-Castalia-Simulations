@@ -12,6 +12,7 @@ breakdown.txt
 energy.txt
 packets.txt
 saida.txt
+*.txt
 
 # ignorando arquivo de dados
 *.csv

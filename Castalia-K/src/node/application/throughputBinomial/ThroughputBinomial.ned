@@ -1,11 +1,11 @@
-package node.application.throughputPolicies;
+package node.application.throughputBinomial;
 
 // The sensor node module. Connects to the wireless channel in order to communicate 
 // with other nodes. Connects to psysical processes so it can sample them.
 
-simple ThroughputPolicies like node.application.iApplication {
+simple ThroughputBinomial like node.application.iApplication {
  parameters:
- 	string applicationID = default ("throughputPolices");
+ 	string applicationID = default ("throughputBinomial");
 	bool collectTraceInfo = default (false);
 	int priority = default (0);
 	int packetHeaderOverhead = default (5);		// in bytes

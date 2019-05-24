@@ -2,10 +2,8 @@
 #define _THROUGHPUTTEST_H_
 
 #include "VirtualApplication.h"
-#include "ThroughputTestControl_m.h"
-#include "ThroughputPriorityMsg_m.h"
+#include "CrossLayerMsg_m.h"
 #include <map>
-#include <random>
 
 using namespace std;
 
@@ -22,26 +20,27 @@ class ThroughputPolicies: public VirtualApplication {
 	int dataSN;
 	int recipientId;
 	string recipientAddress;
-	int vetorPotencia[5];
 	
 	int taxa;
 	
 	double CCAthreshold;
 	double CCAthreshold2;
+
+	int potencia1;
+	int potencia2;
+	int potencia3;
+	int potencia4;
+	int potencia5;
 	bool isSink;
+
+	int politica;
+	int maxIndicePotencia;
 
 	//variables below are used to determine the packet delivery rates.	
 	int numNodes;
 	map<long,int> packetsReceived;
 	map<long,int> bytesReceived;
 	map<long,int> packetsSent;
-
-	// RANDOM STUFF
-	static random_device rd;
-    static mt19937 gen;
-    // static uniform_int_distribution<> dis;
-	static binomial_distribution<> dis;
-	int potenciaAtual = 0;
 
  protected:
 	void startup();
@@ -50,8 +49,12 @@ class ThroughputPolicies: public VirtualApplication {
 	void timerFiredCallback(int);
 	void finishSpecific();
 	int getPriority();
-	void varyTriesByBufferState(double);
 	int handleControlCommand(cMessage * msg);
+	void countTransmitions();
+	int getPacketCount(int node);
+	int varyPowerLevel(int noIndex,int variacao);
+	int policyVaryPowerBetweenRange(int noIndex,int variacao);
+	int policyVaryPowerInCycle(int noIndex,int variacao);
 
  public:
 	int getPacketsSent(int addr) { return packetsSent[addr]; }

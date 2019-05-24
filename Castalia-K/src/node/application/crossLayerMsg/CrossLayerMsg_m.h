@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 4.6 from src/node/application/throughputBinomial/CrossLayerMsg.msg.
+// Generated file, do not edit! Created by nedtool 4.6 from src/node/application/crossLayerMsg/CrossLayerMsg.msg.
 //
 
 #ifndef _CROSSLAYERMSG_M_H_
@@ -16,7 +16,7 @@
 
 
 /**
- * Enum generated from <tt>src/node/application/throughputBinomial/CrossLayerMsg.msg:1</tt> by nedtool.
+ * Enum generated from <tt>src/node/application/crossLayerMsg/CrossLayerMsg.msg:1</tt> by nedtool.
  * <pre>
  * enum CrossLayerCommandDef
  * {
@@ -32,7 +32,7 @@ enum CrossLayerCommandDef {
 };
 
 /**
- * Class generated from <tt>src/node/application/throughputBinomial/CrossLayerMsg.msg:6</tt> by nedtool.
+ * Class generated from <tt>src/node/application/crossLayerMsg/CrossLayerMsg.msg:6</tt> by nedtool.
  * <pre>
  * message CrossLayerMsg
  * {

@@ -10,11 +10,11 @@
  *                                                                          *
  ****************************************************************************/
 
-#include "ThroughputTest2.h"
+#include "ThroughputStandard.h"
 
-Define_Module(ThroughputTest2);
+Define_Module(ThroughputStandard);
 
-void ThroughputTest2::startup()
+void ThroughputStandard::startup()
 {
 	packet_rate = par("packet_rate");
 	recipientAddress = par("nextRecipient").stringValue();
@@ -38,7 +38,7 @@ void ThroughputTest2::startup()
 //	declareOutput("RSSI by Others");
 }
 
-void ThroughputTest2::fromNetworkLayer(ApplicationPacket * rcvPacket,
+void ThroughputStandard::fromNetworkLayer(ApplicationPacket * rcvPacket,
 		const char *source, double rssi, double lqi)
 {
 	int sequenceNumber = rcvPacket->getSequenceNumber();
@@ -67,7 +67,7 @@ void ThroughputTest2::fromNetworkLayer(ApplicationPacket * rcvPacket,
 	}
 }
 
-void ThroughputTest2::timerFiredCallback(int index)
+void ThroughputStandard::timerFiredCallback(int index)
 {
 	switch (index) {
 		case SEND_PACKET:{
@@ -83,7 +83,7 @@ void ThroughputTest2::timerFiredCallback(int index)
 
 // This method processes a received carrier sense interupt. Used only for demo purposes
 // in some simulations. Feel free to comment out the trace command.
-void ThroughputTest2::handleRadioControlMessage(RadioControlMessage *radioMsg)
+void ThroughputStandard::handleRadioControlMessage(RadioControlMessage *radioMsg)
 {
 	switch (radioMsg->getRadioControlMessageKind()) {
 		case CARRIER_SENSE_INTERRUPT:
@@ -92,7 +92,7 @@ void ThroughputTest2::handleRadioControlMessage(RadioControlMessage *radioMsg)
 	}
 }
 
-void ThroughputTest2::finishSpecific() {
+void ThroughputStandard::finishSpecific() {
 	declareOutput("Packets reception rate");
 	declareOutput("Packets loss rate");
 
@@ -102,7 +102,7 @@ void ThroughputTest2::finishSpecific() {
 
 	long bytesDelivered = 0;
 	for (int i = 0; i < numNodes; i++) {
-		ThroughputTest2 *appModule = dynamic_cast<ThroughputTest2*>
+		ThroughputStandard *appModule = dynamic_cast<ThroughputStandard*>
 			(topo->getNode(i)->getModule()->getSubmodule("Application"));
 		if (appModule) {
 			int packetsSent = appModule->getPacketsSent(self);

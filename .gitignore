@@ -12,9 +12,13 @@ breakdown.txt
 energy.txt
 packets.txt
 saida.txt
+*.txt
 
 # ignorando arquivo de dados
 *.csv
+
+# ignorando arquivos python
+__pycache__
 
 # ignorando as outras simulações padrão
 AODVTest

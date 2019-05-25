@@ -1,28 +1,18 @@
-/****************************************************************************
- *  Copyright: National ICT Australia,  2007 - 2010                         *
- *  Developed at the ATP lab, Networked Systems research theme              *
- *  Author(s): Athanassios Boulis, Yuriy Tselishchev                        *
- *  This file is distributed under the terms in the attached LICENSE file.  *
- *  If you do not find this file, copies can be found by writing to:        *
- *                                                                          *
- *      NICTA, Locked Bag 9013, Alexandria, NSW 1435, Australia             *
- *      Attention:  License Inquiry.                                        *
- *                                                                          *
- ****************************************************************************/
-
 #ifndef _THROUGHPUTTEST_H_
 #define _THROUGHPUTTEST_H_
 
 #include "VirtualApplication.h"
+#include "CrossLayerMsg_m.h"
 #include <map>
+#include <random>
 
 using namespace std;
 
-enum ThroughputTestTimers {
+enum ThroughputBinomialTimers {
 	SEND_PACKET = 1
 };
 
-class ThroughputTest: public VirtualApplication {
+class ThroughputBinomial: public VirtualApplication {
  private:
 	double packet_rate;
 	double startupDelay;
@@ -31,12 +21,25 @@ class ThroughputTest: public VirtualApplication {
 	int dataSN;
 	int recipientId;
 	string recipientAddress;
+	int vetorPotencia[5];
 	
+	int taxa;
+	
+	double CCAthreshold;
+	double CCAthreshold2;
+	bool isSink;
+
 	//variables below are used to determine the packet delivery rates.	
 	int numNodes;
 	map<long,int> packetsReceived;
 	map<long,int> bytesReceived;
 	map<long,int> packetsSent;
+
+	// RANDOM STUFF
+	static random_device rd;
+    static mt19937 gen;
+	static binomial_distribution<> dis;
+	int potenciaAtual = 0;
 
  protected:
 	void startup();
@@ -44,6 +47,9 @@ class ThroughputTest: public VirtualApplication {
 	void handleRadioControlMessage(RadioControlMessage *);
 	void timerFiredCallback(int);
 	void finishSpecific();
+	int getPriority();
+	void varyTriesByBufferState(double);
+	int handleControlCommand(cMessage * msg);
 
  public:
 	int getPacketsSent(int addr) { return packetsSent[addr]; }

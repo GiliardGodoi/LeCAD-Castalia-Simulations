@@ -1,27 +1,23 @@
-//****************************************************************************
-//*  Copyright: National ICT Australia,  2007 - 2010                         *
-//*  Developed at the ATP lab, Networked Systems research theme              *
-//*  Author(s): Athanassios Boulis, Yuriy Tselishchev                        *
-//*  This file is distributed under the terms in the attached LICENSE file.  *
-//*  If you do not find this file, copies can be found by writing to:        *
-//*                                                                          *
-//*      NICTA, Locked Bag 9013, Alexandria, NSW 1435, Australia             *
-//*      Attention:  License Inquiry.                                        *
-//*                                                                          *  
-//****************************************************************************/
-
-package node.application.throughputTest;
+package node.application.throughputBinomial;
 
 // The sensor node module. Connects to the wireless channel in order to communicate 
 // with other nodes. Connects to psysical processes so it can sample them.
 
-simple ThroughputTest like node.application.iApplication {
+simple ThroughputBinomial like node.application.iApplication {
  parameters:
- 	string applicationID = default ("throughputTest");
+ 	string applicationID = default ("throughputBinomial");
 	bool collectTraceInfo = default (false);
-	int priority = default (1);
+	int priority = default (0);
 	int packetHeaderOverhead = default (5);		// in bytes
 	int constantDataPayload = default (100);	// in bytes
+
+	int taxa = default (80);
+	
+	double CCAthreshold = default (-95.0);   
+	double CCAthreshold2 = default (-95.0);
+
+	bool isSink = default(false);
+
 	double delayLimit = default (0); 			// application delay limit (0 - no limit)
 											// discard packets arriving after the limit
 

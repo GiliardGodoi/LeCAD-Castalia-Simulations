@@ -51,10 +51,6 @@ class Basic802154: public VirtualMac {
 	int phyBitsPerSymbol;
 	double phyDataRate;
 
-	int limSuperior;
-	int limInferior;
-	int janela;
-
 	map<int,bool> associatedDevices;	// map of assoicated devices (for PAN coordinator)
 
     /*--- 802154Mac state variables  ---*/
@@ -94,7 +90,6 @@ class Basic802154: public VirtualMac {
 	Basic802154Packet *currentPacket;
 
 	void fromNetworkLayer(cPacket *, int);
-	double calculateLastValue(double, double);
 	void fromRadioLayer(cPacket *, double, double);
 
 	void readIniFileParameters(void);
@@ -134,6 +129,14 @@ class Basic802154: public VirtualMac {
 
 	int associatedPAN;	// ID of current PAN (-1 if not associated)
 
+	int janela;
+	int ackCount;
+	int packetCount;
+	int sequenceRecordTaxaMAC;
+
+	int totalPackets;
+	int totalAcks;
+
   protected:
 
 	/*--- Interface functions of the 802.15.4 MAC ---*/
@@ -144,15 +147,28 @@ class Basic802154: public VirtualMac {
 	int getCurrentMacState() { return macState; }
 	int getAssociatedPAN() { return associatedPAN; }
 
+	/*--- Functions that implements 'Cross-Layer' Protocol and taxaMAC */
 	void sendCommand(double);
 	int handleControlCommand(cMessage * msg); 
-	void countTransmitions();
-	int getCountTransmitions();
-	void limpaCountTransmitions();
+	
+	void countPacketTransmission();
 	int getPacketCount();
-	void limpaJanela();
-	float getAckCount();
-	void countAck();
+	void resetPacketCount();
+
+	void setAckResult(int);
+	int getAckCount();
+	void resetAckCounter();
+	
+	void countTaxaMacRecord();
+
+	void evaluateTaxaMac();
+	bool isWindowReached();
+
+	void handleTaxaMac(float);
+	void handleBufferMeasurement(int);
+	
+	/*--- Rewrite method from VirtualMac ---*/
+	virtual int bufferPacket(cPacket *);
 
 	/*--- Virtual interface functions can be overwritten by a decision module ---*/
 	virtual void startup();

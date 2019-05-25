@@ -10,11 +10,11 @@
  *                                                                          *
  ****************************************************************************/
 
-#include "ThroughputTest.h"
+#include "ThroughputStandard.h"
 
-Define_Module(ThroughputTest);
+Define_Module(ThroughputStandard);
 
-void ThroughputTest::startup()
+void ThroughputStandard::startup()
 {
 	packet_rate = par("packet_rate");
 	recipientAddress = par("nextRecipient").stringValue();
@@ -32,12 +32,13 @@ void ThroughputTest::startup()
 	if (packet_spacing > 0 && recipientAddress.compare(SELF_NETWORK_ADDRESS) != 0)
 		setTimer(SEND_PACKET, packet_spacing + startupDelay);
 	else
-		trace() << "Not sending packets";
+		trace() << "Not sending packets today";
 
 	declareOutput("Packets received per node");
+//	declareOutput("RSSI by Others");
 }
 
-void ThroughputTest::fromNetworkLayer(ApplicationPacket * rcvPacket,
+void ThroughputStandard::fromNetworkLayer(ApplicationPacket * rcvPacket,
 		const char *source, double rssi, double lqi)
 {
 	int sequenceNumber = rcvPacket->getSequenceNumber();
@@ -47,7 +48,9 @@ void ThroughputTest::fromNetworkLayer(ApplicationPacket * rcvPacket,
 	if (recipientAddress.compare(SELF_NETWORK_ADDRESS) == 0) {
 		if (delayLimit == 0 || (simTime() - rcvPacket->getCreationTime()) <= delayLimit) { 
 			trace() << "Received packet #" << sequenceNumber << " from node " << source;
+			trace() << "RSSI " << rssi << " " << source;
 			collectOutput("Packets received per node", sourceId);
+//			collectOutput("RSSI by Others","",rssi);
 			packetsReceived[sourceId]++;
 			bytesReceived[sourceId] += rcvPacket->getByteLength();
 		} else {
@@ -57,13 +60,14 @@ void ThroughputTest::fromNetworkLayer(ApplicationPacket * rcvPacket,
 	// Packet has to be forwarded to the next hop recipient
 	} else {
 		ApplicationPacket* fwdPacket = rcvPacket->dup();
+		trace() << " Encaminhando pacote " << recipientAddress.c_str();
 		// Reset the size of the packet, otherwise the app overhead will keep adding on
 		fwdPacket->setByteLength(0);
 		toNetworkLayer(fwdPacket, recipientAddress.c_str());
 	}
 }
 
-void ThroughputTest::timerFiredCallback(int index)
+void ThroughputStandard::timerFiredCallback(int index)
 {
 	switch (index) {
 		case SEND_PACKET:{
@@ -79,7 +83,7 @@ void ThroughputTest::timerFiredCallback(int index)
 
 // This method processes a received carrier sense interupt. Used only for demo purposes
 // in some simulations. Feel free to comment out the trace command.
-void ThroughputTest::handleRadioControlMessage(RadioControlMessage *radioMsg)
+void ThroughputStandard::handleRadioControlMessage(RadioControlMessage *radioMsg)
 {
 	switch (radioMsg->getRadioControlMessageKind()) {
 		case CARRIER_SENSE_INTERRUPT:
@@ -88,7 +92,7 @@ void ThroughputTest::handleRadioControlMessage(RadioControlMessage *radioMsg)
 	}
 }
 
-void ThroughputTest::finishSpecific() {
+void ThroughputStandard::finishSpecific() {
 	declareOutput("Packets reception rate");
 	declareOutput("Packets loss rate");
 
@@ -98,7 +102,7 @@ void ThroughputTest::finishSpecific() {
 
 	long bytesDelivered = 0;
 	for (int i = 0; i < numNodes; i++) {
-		ThroughputTest *appModule = dynamic_cast<ThroughputTest*>
+		ThroughputStandard *appModule = dynamic_cast<ThroughputStandard*>
 			(topo->getNode(i)->getModule()->getSubmodule("Application"));
 		if (appModule) {
 			int packetsSent = appModule->getPacketsSent(self);

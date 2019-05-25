@@ -1,9 +1,9 @@
 #mkdir throughputPriority
 #cd throughputPriority
 
-cat ThroughputTest.cc | sed -e 's/ThroughputTest/ThroughputPolicies/g' > ThroughputPolicies.cc
-cat ThroughputTest.h | sed -e 's/ThroughputTest/ThroughputPolicies/g' > ThroughputPolicies.h
-cat ThroughputTest.ned | sed -e 's/ThroughputTest/ThroughputPolicies/g' > ThroughputPolicies.ned
+cat ThroughputTest.cc | sed -e 's/ThroughputTest/ThroughputCL4/g' > ThroughputCL4.cc
+cat ThroughputTest.h | sed -e 's/ThroughputTest/ThroughputCL4/g' > ThroughputCL4.h
+cat ThroughputTest.ned | sed -e 's/ThroughputTest/ThroughputCL4/g' > ThroughputCL4.ned
 
 # Não mudou "node.application.throughputBufferAware" no arquivo ThroughputBufferAware.ned
 # pode ser que de certo isso aqui

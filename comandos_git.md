@@ -192,16 +192,16 @@ Se o resultado abaixo for exibido, o comando reset *não* alterou o diretório d
 	M	meu_arquivo.txt
 
 A alteração do diretório pode ser realizada através do comando abaixo:
-	
+
 	git checkout meu_arquivo.txt
 
 ## Repositório Remoto
 
 ### Exibir os repositórios remotos
 
-	git remote
-	
-	git remote -v
+    git remote
+
+    git remote -v
 
 ### Vincular repositório local com um repositório remoto
 
@@ -347,7 +347,7 @@ A mensagem indicando um *merge* manual será:
 
 ##### Apagar branch remoto
 
-	git push origin:bug-123
+	git push origin :bug-123
 
 ### Rebasing
 

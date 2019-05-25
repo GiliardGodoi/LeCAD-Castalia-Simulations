@@ -18,11 +18,11 @@
 
 using namespace std;
 
-enum ThroughputTestTimers {
+enum ThroughputStandardTimers {
 	SEND_PACKET = 1
 };
 
-class ThroughputTest: public VirtualApplication {
+class ThroughputStandard: public VirtualApplication {
  private:
 	double packet_rate;
 	double startupDelay;

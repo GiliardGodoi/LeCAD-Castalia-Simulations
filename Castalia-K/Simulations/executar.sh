@@ -30,39 +30,39 @@ repeticao=3
 #     done
 # done
 
-echo "SIMULAÇÃO CL Binomial"
-mkdir CLBinomial
-cp omnetpp.ini  CLBinomial/
-cd CLBinomial/
-Castalia -c General,CLBinomial,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
-listar_dados
-cd ..
-echo "...fim simulação"
+# echo "SIMULAÇÃO CL Binomial"
+# mkdir CLBinomial
+# cp omnetpp.ini  CLBinomial/
+# cd CLBinomial/
+# Castalia -c General,CLBinomial,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
+# listar_dados
+# cd ..
+# echo "...fim simulação"
 
 
-echo "SIMULAÇÃO CL CL4"
-mkdir CL4
-cp omnetpp.ini  CL4/
-cd CL4/
-Castalia -c General,CL4,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
-listar_dados
-cd ..
-echo "...fim simulação"
+# echo "SIMULAÇÃO CL CL4"
+# mkdir CL4
+# cp omnetpp.ini  CL4/
+# cd CL4/
+# Castalia -c General,CL4,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
+# listar_dados
+# cd ..
+# echo "...fim simulação"
 
-echo "SIMULAÇÃO CL CL2"
-mkdir CL2
-cp omnetpp.ini  CL2/
-cd CL2/
-Castalia -c General,CL2,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
-listar_dados
-cd ..
-echo "...fim simulação"
+# echo "SIMULAÇÃO CL CL2"
+# mkdir CL2
+# cp omnetpp.ini  CL2/
+# cd CL2/
+# Castalia -c General,CL2,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
+# listar_dados
+# cd ..
+# echo "...fim simulação"
 
 echo "SIMULAÇÃO PA"
 mkdir PA
 cp omnetpp.ini  PA/
 cd PA/
-Castalia -c General,PA,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
+Castalia -c General,PA,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt --debug
 listar_dados
 cd ..
 echo "...fim simulação"
@@ -71,7 +71,7 @@ echo "SIMULAÇÃO PB"
 mkdir PB
 cp omnetpp.ini  PB/
 cd PB/
-Castalia -c General,PB,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt
+Castalia -c General,PB,setRateHigh,varyInterferenceModel,collectTrace -r $repeticao  -o saida.txt --debug
 listar_dados
 cd ..
 echo "...fim simulação"

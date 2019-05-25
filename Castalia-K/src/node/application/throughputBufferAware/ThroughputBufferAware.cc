@@ -1,5 +1,6 @@
 #include "ThroughputBufferAware.h"
 #include "Basic802154Control_m.h"
+
 Define_Module(ThroughputBufferAware);
 
 void ThroughputBufferAware::startup()

@@ -242,14 +242,14 @@ int ThroughputCL2::handleControlCommand(cMessage * msg){
 //		trace() << "Chegou APP ";
 		CrossLayerMsg *cmd = check_and_cast <CrossLayerMsg*>(msg);
 		taxaMAC = cmd->getTaxaMAC();
-		trace() << "TAXA_MAC    "<<taxaMAC;
+		trace() << "TAXAMAC_INFO    "<< taxaMAC;
 
 		if (taxaMAC < taxa){
-			trace() << " Altera1 " << potencia1 << " TaxaMAC " << taxaMAC;
+			trace() << "POTENCIA_INFO " << potencia1 << " TAXA_MAC " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia1));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold2));
 		} else {
-			trace() << " Altera2 " << potencia2 << " TaxaMAC " << taxaMAC;
+			trace() << "POTENCIA_INFO " << potencia2 << " TAXA_MAC " << taxaMAC;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia2));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
 		}

@@ -119,3 +119,15 @@ void ThroughputTest::finishSpecific() {
 		collectOutput("Energy nJ/bit","",energy);
 	}
 }
+
+int ThroughputTest::handleControlCommand(cMessage * msg){
+    
+    double taxaMAC = 0.0;
+
+    CrossLayerMsg *cmd = check_and_cast <CrossLayerMsg*>(msg);
+    taxaMAC = cmd->getTaxaMAC();
+    trace() << "TAXAMAC_INFO    "<< taxaMAC;
+
+    delete msg;
+    return 1;
+}

@@ -243,8 +243,8 @@ int ThroughputBufferAware::handleControlCommand(cMessage * msg){
 			{
 				varyPowerTransmissionByBufferState(state);
 			}
-			trace() << "BUFFER_INFO    " << state << "    POTENCIA    " << potenciaAtual << "    IS_TAXA_BUFFER    " << utilizarTaxaBuffer;
-			
+			trace() << "BUFFER_INFO    " << state << "    IS_TAXA_BUFFER    " << utilizarTaxaBuffer;
+			trace() << "POTENCIA_INFO    " << potenciaAtual ;
 		}
 	}
 

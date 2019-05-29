@@ -249,59 +249,59 @@ int ThroughputCL4::handleControlCommand(cMessage * msg){
 	if(atoi(SELF_NETWORK_ADDRESS)!=0){
 
 //		trace()<<"Packet Spacing " << packet_spacing << " Packet Rate " << packet_rate;
-		trace() << "Chegou APP ";
+
 		CrossLayerMsg *cmd = check_and_cast <CrossLayerMsg*>(msg);
 		taxaMAC = cmd->getTaxaMAC();
-		trace() << "TAXAMAC"<<taxaMAC;
+		trace() << "TAXAMAC_INFO    "<< taxaMAC;
 
 	
 // CONFIGURAÇÃO PARA O NÓ 1 e 2
 
 	if (taxaMAC <= 40 && ( (atoi(SELF_NETWORK_ADDRESS)==1) || (atoi(SELF_NETWORK_ADDRESS)==2) ) ) { 
-			trace() << " ALTERADO PARA POTENCIA1 " << potencia1;
+			trace() << "POTENCIA_INFO " << potencia1;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia1)); 
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold2)); 
 		} 
 
 		else if (taxaMAC < 70 && (atoi(SELF_NETWORK_ADDRESS)==1 || (atoi(SELF_NETWORK_ADDRESS)==2)) ) {
-			trace() << " ALTERADO PARA POTENCIA2" << potencia2;
+			trace() << "POTENCIA_INFO" << potencia2;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia2));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
 		}
 
 		else if (taxaMAC < 90 && (atoi(SELF_NETWORK_ADDRESS)==1 || (atoi(SELF_NETWORK_ADDRESS)==2)) ) {
-			trace() << " ALTERADO PARA POTENCIA3" << potencia3;
+			trace() << "POTENCIA_INFO" << potencia3;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia3));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
 		}
 
 		else if (taxaMAC >= 90 && (atoi(SELF_NETWORK_ADDRESS)==1 || (atoi(SELF_NETWORK_ADDRESS)==2)) ){
-			trace() << " ALTERADO PARA POTENCIA4" << potencia4;
+			trace() << "POTENCIA_INFO" << potencia4;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia4));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
 		}
 // CONFIGURAÇÃO PARA O NÓ 3
 
 		else if ( taxaMAC <= 40 &&  (atoi(SELF_NETWORK_ADDRESS)==3) ) { 
-			trace() << " ALTERADO PARA POTENCIA1 " << potencia1;
+			trace() << "POTENCIA_INFO " << potencia1;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia1)); 
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold2)); 
 		} 
 
 		else if (taxaMAC < 70 && (atoi(SELF_NETWORK_ADDRESS)==3) ) {
-			trace() << " ALTERADO PARA POTENCIA2" << potencia2;
+			trace() << "POTENCIA_INFO" << potencia2;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia2));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
 		}
 
 		else if (taxaMAC < 90 && (atoi(SELF_NETWORK_ADDRESS)==3 ) ) {
-			trace() << " ALTERADO PARA POTENCIA3" << potencia3;
+			trace() << "POTENCIA_INFO" << potencia3;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia3));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
 		}
 
 		else if (taxaMAC >= 90 && (atoi(SELF_NETWORK_ADDRESS)==3 )) {
-			trace() << " ALTERADO PARA POTENCIA4" << potencia4;
+			trace() << "POTENCIA_INFO" << potencia4;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia4));
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold));
 		}
@@ -310,19 +310,11 @@ int ThroughputCL4::handleControlCommand(cMessage * msg){
 // CONFIGURAÇÃO PARA O NÓ 4 e 5
 
 		else if (taxaMAC <= 100 && ( (atoi(SELF_NETWORK_ADDRESS)==4) || (atoi(SELF_NETWORK_ADDRESS)==5) ) ) { 
-			trace() << " ALTERADO PARA POTENCIA4 " << potencia4;
+			trace() << "POTENCIA_INFO " << potencia4;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia1)); 
 			toNetworkLayer(createRadioCommand(SET_CCA_THRESHOLD,CCAthreshold2)); 
 		} 
-
 		
-	
-		if (cmd->getTaxaMAC() == 1 && packet_rate <= packet_rate_safe && packet_rate > 1){
-			packet_rate = packet_rate - 1;
-		} else if (cmd->getTaxaMAC() == 2 && packet_rate <= packet_rate_safe && packet_rate >= 0){
-			packet_rate = packet_rate + 1;
-		}
-//		
 		delete cmd;
 	}
 

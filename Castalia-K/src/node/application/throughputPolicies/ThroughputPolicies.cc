@@ -501,7 +501,8 @@ int ThroughputPolicies::handleControlCommand(cMessage * msg){
 		// funcao que varia a potencia
 		// varyPowerLevel(int noIndex, int nivelAnterior, int variacao)
 		int potencia = varyPowerLevel(indexNO, variacao);
-		trace() << "ALTERADO PARA POTENCIA  " << potencia << "  TAXA MAC  " << taxaMAC;
+		trace() << "POTENCIA_INFO   " << potencia;
+        trace() << "TAXAMAC_INFO    " << taxaMAC;
 		toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));
 		vetorNivelMACNo[indexNO] = nivelClassificado;
 

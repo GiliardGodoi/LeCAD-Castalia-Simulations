@@ -187,9 +187,9 @@ int ThroughputBinomial::handleControlCommand(cMessage * msg){
 	switch (INFO_TYPE) {
 		
 		case TAXAMAC_INFO : {
-			trace() << "RANDOMICO    " << nroRandomico << "    POTENCIA    " << potencia;
+			trace() << "POTENCIA_INFO" << potencia  << "    RANDOMICO    " << nroRandomico;
 			trace() << "TAXAMAC_INFO    " << cmd->getTaxaMAC() << "    BUFFER_INFO    " << cmd->getBufferState();
-
+            
 			potenciaAtual = potencia;
 			toNetworkLayer(createRadioCommand(SET_TX_OUTPUT,potencia));	
 			break;	

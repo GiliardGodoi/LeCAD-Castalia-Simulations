@@ -14,6 +14,7 @@
 #define _THROUGHPUTTEST_H_
 
 #include "VirtualApplication.h"
+#include "CrossLayerMsg_m.h"
 #include <map>
 
 using namespace std;
@@ -44,6 +45,8 @@ class ThroughputTest: public VirtualApplication {
 	void handleRadioControlMessage(RadioControlMessage *);
 	void timerFiredCallback(int);
 	void finishSpecific();
+
+    int handleControlCommand(cMessage *);
 
  public:
 	int getPacketsSent(int addr) { return packetsSent[addr]; }

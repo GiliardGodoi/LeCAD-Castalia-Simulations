@@ -5,6 +5,8 @@ out
 bin
 CastaliaBin
 Castalia-K/Makefile
+Simulations/
+!Simulations/Parameters
 
 # ignorando arquivos de dados das simulações
 Castalia-Trace.txt

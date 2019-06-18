@@ -1,2 +1,3 @@
 # LeCAD-Castalia-Simulations
-Gerenciar as simulação produzidas com o simulador Castalia.
+
+Repositório com o código das simulações realizadas no estudo de redes WBAN utilizando arquiteturas *cross-layer*.
